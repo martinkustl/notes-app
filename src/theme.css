@@ -1,4 +1,3 @@
-
 /* Ionic Variables and Theming. For more information, please see
 // https://beta.ionicframework.com/docs/theming/
 // The app direction is used to include
@@ -167,6 +166,7 @@
   --ion-color-food: #3bc7c4;
   --ion-color-documentation: #b16be3;
   --ion-color-navigation: #6600cc;
+  --ion-toolbar-border-width: 20px;
 }
 
 .md {

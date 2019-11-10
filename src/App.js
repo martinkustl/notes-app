@@ -1,8 +1,21 @@
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet } from '@ionic/react';
+import {
+  IonApp,
+  IonIcon,
+  IonLabel,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs
+} from '@ionic/react';
+import { addCircleOutline, search, people, home, lock } from 'ionicons/icons';
+
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
+import Search from './pages/Search';
+import Shared from './pages/Shared';
+import PrivateNotes from './pages/PrivateNotes';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -38,10 +51,36 @@ const App = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <IonRouterOutlet>
-          <Route path="/home" component={Home} exact={true} />
-          <Route exact path="/" render={() => <Redirect to="/home" />} />
-        </IonRouterOutlet>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route path="/home" component={Home} exact={true} />
+            <Route path="/search" component={Search} exact={true} />
+            <Route
+              path="/private-notes"
+              component={PrivateNotes}
+              exact={true}
+            />
+            <Route path="/shared" component={Shared} exact={true} />
+            <Route exact path="/" render={() => <Redirect to="/home" />} />
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="home" href="/home">
+              <IonIcon icon={home} />
+            </IonTabButton>
+            <IonTabButton tab="search" href="/search">
+              <IonIcon icon={search} />
+            </IonTabButton>
+            <IonTabButton tab="add">
+              <IonIcon icon={addCircleOutline} />
+            </IonTabButton>
+            <IonTabButton tab="private" href="/private-notes">
+              <IonIcon icon={lock} />
+            </IonTabButton>
+            <IonTabButton tab="shared" href="/shared">
+              <IonIcon icon={people} />
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
       </IonReactRouter>
     </IonApp>
   );

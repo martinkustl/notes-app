@@ -3,53 +3,29 @@ import {
   IonHeader,
   IonPage,
   IonTitle,
-  IonToolbar
+  IonToolbar,
+  IonButtons,
+  IonButton,
+  IonIcon
 } from '@ionic/react';
+import { menu } from 'ionicons/icons';
 import React from 'react';
-
-/* const Home: React.FC = () => {
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Ionic Blank</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        The world is your oyster.
-        <p>
-          If you get lost, the{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/">
-            docs
-          </a>{' '}
-          will be your guide.
-        </p>
-      </IonContent>
-    </IonPage>
-  );
-}; */
 
 const Home = () => {
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Ionic Blank</IonTitle>
+          <IonButtons slot="start">
+            <IonButton>
+              <IonIcon slot="icon-only" name="menu" icon={menu}></IonIcon>
+            </IonButton>
+          </IonButtons>
+          <IonTitle>Notes App</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        The world is your oyster.
-        <p>
-          If you get lost, the{' '}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://ionicframework.com/docs/"
-          >
-            docs
-          </a>{' '}
-          will be your guide.
-        </p>
+      <IonContent>
+        <h1>Home</h1>
       </IonContent>
     </IonPage>
   );
