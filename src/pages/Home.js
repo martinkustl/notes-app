@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   IonContent,
   IonHeader,
@@ -5,28 +6,21 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  IonButton,
-  IonIcon
+  IonMenuButton
 } from '@ionic/react';
-import { menu } from 'ionicons/icons';
-import React from 'react';
 
 const Home = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar color="primary">
           <IonButtons slot="start">
-            <IonButton>
-              <IonIcon slot="icon-only" name="menu" icon={menu}></IonIcon>
-            </IonButton>
+            <IonMenuButton />
           </IonButtons>
           <IonTitle>Notes App</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        <h1>Home</h1>
-      </IonContent>
+      <IonContent color="primary"></IonContent>
     </IonPage>
   );
 };
