@@ -5,27 +5,33 @@ import {
   IonTitle,
   IonContent,
   IonList,
-  IonItem
+  IonItem,
+  IonButton
 } from '@ionic/react';
 import React from 'react';
-import './HomeMenu.css';
+import { StyledIonList } from '../../styles';
+import styled from 'styled-components';
+
+/* const StyledList = styled(IonList)`
+  background-color: var(--ion-color-primary);
+`; */
 
 const HomeMenu = () => {
   return (
     <IonMenu contentId="main" type="overlay" color="primary">
       <IonHeader color="primary">
         <IonToolbar color="primary">
-          <IonTitle>Start Menu</IonTitle>
+          <IonTitle>Menu</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent color="primary">
-        <IonList className="customizedList">
-          <IonItem color="primary">Menu Item</IonItem>
-          <IonItem color="primary">Menu Item</IonItem>
-          <IonItem color="primary">Menu Item</IonItem>
-          <IonItem color="primary">Menu Item</IonItem>
-          <IonItem color="primary">Menu Item</IonItem>
-        </IonList>
+        <StyledIonList className="customizedList">
+          <IonItem color="primary">Upravit barvy štítků</IonItem>
+          <IonItem color="primary">Můj profil</IonItem>
+        </StyledIonList>
+        <IonButton color="danger" fill="clear">
+          Odhlásit
+        </IonButton>
       </IonContent>
     </IonMenu>
   );

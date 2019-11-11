@@ -4,8 +4,12 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
-  IonContent
+  IonContent,
+  IonSearchbar,
+  IonItem
 } from '@ionic/react';
+
+import { StyledIonList } from '../styles';
 
 const Search = () => {
   return (
@@ -14,8 +18,16 @@ const Search = () => {
         <IonToolbar color="primary">
           <IonTitle>Private notes</IonTitle>
         </IonToolbar>
+        <IonToolbar color="primary">
+          <IonSearchbar placeholder="Hledat" color="tertiary"></IonSearchbar>
+        </IonToolbar>
       </IonHeader>
-      <IonContent color="primary"></IonContent>
+      <IonContent color="primary">
+        <StyledIonList>
+          <IonItem color="primary">První search item</IonItem>
+          <IonItem color="primary">Druhý search item</IonItem>
+        </StyledIonList>
+      </IonContent>
     </IonPage>
   );
 };

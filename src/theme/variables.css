@@ -3,7 +3,7 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
-  --ion-color-primary: #e2f7f5;
+  --ion-color-primary: #eefcfa; /*#e2f7f5*/
   --ion-color-primary-rgb: 255, 255, 255;
   --ion-color-primary-contrast: #000000;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
@@ -17,14 +17,14 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-secondary-shade: #d45f24;
   --ion-color-secondary-tint: #f27b3e;
 
-  --ion-color-tertiary: #000000;
-  --ion-color-tertiary-rgb: 0, 0, 0;
-  --ion-color-tertiary-contrast: #ffffff;
-  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #000000;
-  --ion-color-tertiary-tint: #1a1a1a;
+  --ion-color-tertiary: #bef8f1;
+  --ion-color-tertiary-rgb: 190, 248, 241;
+  --ion-color-tertiary-contrast: #000000;
+  --ion-color-tertiary-contrast-rgb: 0, 0, 0;
+  --ion-color-tertiary-shade: #a7dad4;
+  --ion-color-tertiary-tint: #c5f9f2;
 
-  --ion-color-success: #10dc60;
+  --ion-color-success: #00bd4b;
   --ion-color-success-rgb: 16, 220, 96;
   --ion-color-success-contrast: #ffffff;
   --ion-color-success-contrast-rgb: 255, 255, 255;
@@ -66,6 +66,13 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
 }
+ion-list-header {
+  font-size: 17px;
+  min-height: 0;
+  height: 30px;
+  line-height: 30px;
+}
+
 ion-toolbar {
   --border-color: transparent;
 }
@@ -89,6 +96,14 @@ ion-menu-button {
   --background-focused: var(--ion-color-secondary);
 }
 
-ion-list > .list-md {
-  --background: red !important;
+ion-content {
+  --padding-top: 10px;
+}
+
+ion-button {
+  box-shadow: none !important;
+}
+
+* {
+  font-family: Arial, Helvetica, sans-serif !important;
 }
