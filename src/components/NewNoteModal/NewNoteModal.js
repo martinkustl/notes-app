@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   IonModal,
   IonButton,
@@ -8,11 +8,11 @@ import {
   IonButtons,
   IonTitle,
   IonIcon
-} from '@ionic/react';
+} from "@ionic/react";
 
-import { close, checkmark } from 'ionicons/icons';
+import { close } from "ionicons/icons";
 
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const StyledModal = styled(IonModal)`
   --background: var(--ion-color-primary);

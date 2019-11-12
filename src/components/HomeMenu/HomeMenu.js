@@ -4,17 +4,11 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonList,
   IonItem,
   IonButton
 } from '@ionic/react';
 import React from 'react';
 import { StyledIonList } from '../../styles';
-import styled from 'styled-components';
-
-/* const StyledList = styled(IonList)`
-  background-color: var(--ion-color-primary);
-`; */
 
 const HomeMenu = () => {
   return (

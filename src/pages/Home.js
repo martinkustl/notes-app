@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { withRouter } from "react-router-dom";
 import {
   IonContent,
   IonHeader,
@@ -12,15 +13,15 @@ import {
   IonItem,
   IonIcon,
   IonButton
-} from '@ionic/react';
+} from "@ionic/react";
 
-import { add, more } from 'ionicons/icons';
+import { add, more } from "ionicons/icons";
 
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import { StyledIonList } from '../styles';
+import { StyledIonList } from "../styles";
 
-import NewFolderModal from '../components/NewFolderModal/NewFolderModal';
+import NewFolderModal from "../components/NewFolderModal/NewFolderModal";
 
 const StyledOptionsButton = styled(IonButton)`
   --color: var(--ion-color-dark);
@@ -36,16 +37,12 @@ const StyledCircle = styled.div`
   margin-right: 0.4rem;
 `;
 
-const foldersArray = ['První složka', 'Druhá složka', 'Třetí složka'];
+const foldersArray = ["První složka", "Druhá složka", "Třetí složka"];
 
-const notesArray = ['První poznámka', 'Druhá poznámka', 'Třetí poznámka'];
+const notesArray = ["První poznámka", "Druhá poznámka", "Třetí poznámka"];
 
-const Home = () => {
+const Home = props => {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
-
-  const handleNoteClick = () => {
-    console.log('clicked');
-  };
 
   return (
     <IonPage>
@@ -91,8 +88,9 @@ const Home = () => {
             return (
               <IonItem
                 color="primary"
+                routerDirection="forward"
+                routerLink="/note/:id"
                 key={index}
-                onClick={() => handleNoteClick()}
                 detail
               >
                 <StyledCircle />
@@ -106,4 +104,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withRouter(Home);
