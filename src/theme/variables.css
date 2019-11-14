@@ -3,7 +3,7 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
-  --ion-color-primary: #eefcfa; /*#e2f7f5*/
+  --ion-color-primary: #f1fcfa; /*#e2f7f5*/
   --ion-color-primary-rgb: 255, 255, 255;
   --ion-color-primary-contrast: #000000;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
@@ -73,8 +73,19 @@ ion-list-header {
   line-height: 30px;
 }
 
+ion-item {
+  --background: var(--ion-color-primary);
+  --border-color: var(--ion-color-medium);
+  --detail-icon-color: var(--ion-color-medium);
+  --detail-icon-opacity: 1;
+}
+
 ion-toolbar {
   --border-color: transparent;
+}
+
+ion-tab-bar {
+  --border: 1px solid var(--ion-color-medium);
 }
 
 ion-header::after {

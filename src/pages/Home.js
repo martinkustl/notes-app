@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { withRouter } from "react-router-dom";
+import React, { useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import {
   IonContent,
   IonHeader,
@@ -13,15 +13,15 @@ import {
   IonItem,
   IonIcon,
   IonButton
-} from "@ionic/react";
+} from '@ionic/react';
 
-import { add, more } from "ionicons/icons";
+import { add, more } from 'ionicons/icons';
 
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import { StyledIonList } from "../styles";
+import { StyledIonList } from '../styles';
 
-import NewFolderModal from "../components/NewFolderModal/NewFolderModal";
+import NewFolderModal from '../components/NewFolderModal/NewFolderModal';
 
 const StyledOptionsButton = styled(IonButton)`
   --color: var(--ion-color-dark);
@@ -37,9 +37,14 @@ const StyledCircle = styled.div`
   margin-right: 0.4rem;
 `;
 
-const foldersArray = ["První složka", "Druhá složka", "Třetí složka"];
+const StyledIonItem = styled(IonItem)`
+  --background-color: var(--ion-color-dark);
+  --color: blue;
+`;
 
-const notesArray = ["První poznámka", "Druhá poznámka", "Třetí poznámka"];
+const foldersArray = ['První složka', 'Druhá složka', 'Třetí složka'];
+
+const notesArray = ['První poznámka', 'Druhá poznámka', 'Třetí poznámka'];
 
 const Home = props => {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
@@ -72,7 +77,7 @@ const Home = props => {
           />
           {foldersArray.map((folder, index) => {
             return (
-              <IonItem color="primary" key={index}>
+              <IonItem key={index}>
                 <StyledCircle />
                 <IonLabel>{folder}</IonLabel>
                 <StyledOptionsButton fill="clear">
@@ -87,7 +92,6 @@ const Home = props => {
           {notesArray.map((note, index) => {
             return (
               <IonItem
-                color="primary"
                 routerDirection="forward"
                 routerLink="/note/:id"
                 key={index}
