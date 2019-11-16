@@ -42,13 +42,21 @@ import './theme/variables.css';
 
 import NewNoteModal from './components/NewNoteModal/NewNoteModal';
 
-const StyledAddTabButton = styled(IonButton)`
+/* const StyledAddTabButton = styled(IonButton)`
   --padding-start: 0;
   --padding-end: 0;
-  font-size: 22.5px;
+  font-size: 22px;
   width: 100%;
   height: 100%;
   margin: 0;
+`;
+
+const StyledAddIcon = styled(IonIcon)`
+  padding-top: 2px;
+`; */
+
+const StyledAddTabButton = styled(IonTabButton)`
+  --color: var(--ion-color-success);
 `;
 
 const App = props => {
@@ -74,11 +82,14 @@ const App = props => {
           <IonIcon icon={search} />
         </IonTabButton>
         <IonTabButton tab="add">
-          <StyledAddTabButton
+          {/* <StyledAddTabButton
             onClick={() => setShowNewNoteModal(true)}
             color="success"
             fill="clear"
           >
+            <IonIcon icon={addCircleOutline} />
+          </StyledAddTabButton> */}
+          <StyledAddTabButton onClick={() => setShowNewNoteModal(true)}>
             <IonIcon icon={addCircleOutline} />
           </StyledAddTabButton>
           <NewNoteModal
@@ -86,9 +97,9 @@ const App = props => {
             onShowNewNoteModalChange={setShowNewNoteModal}
           />
         </IonTabButton>
-        <IonTabButton tab="private" href="/private-notes">
+        {/* <IonTabButton tab="private" href="/private-notes">
           <IonIcon icon={lock} />
-        </IonTabButton>
+        </IonTabButton> */}
         <IonTabButton tab="shared" href="/shared">
           <IonIcon icon={people} />
         </IonTabButton>

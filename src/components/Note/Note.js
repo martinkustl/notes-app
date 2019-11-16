@@ -1,7 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
 
-import { microphone, camera, images } from 'ionicons/icons';
+import NoteActionButtons from '../NoteActionButtons/NoteActionButtons';
 
 import {
   IonPage,
@@ -11,31 +10,14 @@ import {
   IonTitle,
   IonContent,
   IonBackButton,
-  IonSegment,
-  IonSegmentButton,
-  IonIcon,
   useIonViewWillEnter,
-  useIonViewWillLeave
+  useIonViewWillLeave,
+  IonImg
 } from '@ionic/react';
 
-const StyledIonSegment = styled(IonSegment)`
-  position: absolute;
-  bottom: 0;
-  height: 50px;
-`;
-
-const StyledIonSegmentButton = styled(IonSegmentButton)`
-  --background: var(--ion-color-primary);
-  --color: var(--ion-color-primary-contrast);
-  --border-color: var(--ion-color-medium);
-  --color-activated: var(--ion-color-secondary);
-  /* --color-checked: var(--ion-color-secondary); */
-  border: none;
-  --border-radius: 0;
-  border-top: 1px solid black;
-`;
-
 const Note = ({ onIsNoteOpenChange }) => {
+  const [photoUrl, setPhotoUrl] = useState();
+
   useIonViewWillEnter(() => {
     onIsNoteOpenChange(true);
   });
@@ -44,30 +26,25 @@ const Note = ({ onIsNoteOpenChange }) => {
     onIsNoteOpenChange(false);
   });
 
+  const onPhotoUrlChange = state => {
+    setPhotoUrl(state);
+  };
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar color="primary">
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/" />
+            <IonBackButton defaultHref="/" color="secondary" />
           </IonButtons>
           <IonTitle>Poznámka</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent color="primary">
+      <IonContent color="primary" className="ion-padding" fullscreen>
         První poznámka
-        <StyledIonSegment>
-          <StyledIonSegmentButton>
-            <IonIcon icon={camera} size="large" />
-          </StyledIonSegmentButton>
-          <StyledIonSegmentButton>
-            <IonIcon icon={images} size="large" />
-          </StyledIonSegmentButton>
-          <StyledIonSegmentButton>
-            <IonIcon icon={microphone} size="large" />
-          </StyledIonSegmentButton>
-        </StyledIonSegment>
+        {photoUrl && <IonImg src={photoUrl} />}
       </IonContent>
+      <NoteActionButtons onPhotoUrlChange={onPhotoUrlChange} />
     </IonPage>
   );
 };

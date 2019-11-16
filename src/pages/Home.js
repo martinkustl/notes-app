@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { withRouter } from 'react-router-dom';
+
 import {
   IonContent,
   IonHeader,
@@ -37,16 +37,11 @@ const StyledCircle = styled.div`
   margin-right: 0.4rem;
 `;
 
-const StyledIonItem = styled(IonItem)`
-  --background-color: var(--ion-color-dark);
-  --color: blue;
-`;
-
 const foldersArray = ['První složka', 'Druhá složka', 'Třetí složka'];
 
 const notesArray = ['První poznámka', 'Druhá poznámka', 'Třetí poznámka'];
 
-const Home = props => {
+const Home = () => {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
 
   return (
@@ -54,7 +49,7 @@ const Home = props => {
       <IonHeader>
         <IonToolbar color="primary">
           <IonButtons slot="start">
-            <IonMenuButton />
+            <IonMenuButton color="secondary" />
           </IonButtons>
           <IonTitle>Notes App</IonTitle>
         </IonToolbar>
@@ -108,4 +103,4 @@ const Home = props => {
   );
 };
 
-export default withRouter(Home);
+export default Home;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   IonModal,
   IonButton,
@@ -6,7 +6,8 @@ import {
   IonHeader,
   IonToolbar,
   IonButtons,
-  IonTitle
+  IonTitle,
+  IonInput
 } from '@ionic/react';
 import styled from 'styled-components';
 
@@ -14,16 +15,30 @@ const StyledModal = styled(IonModal)`
   --background: var(--ion-color-primary);
 `;
 
+const StyledForm = styled.form``;
+
 const NewFolderModal = ({ showNewFolderModal, onShowNewFolderModalChange }) => {
+  const [newFolderInput, setNewFolderInput] = useState();
+
+  const handleFolderInputChange = e => {
+    setNewFolderInput(e.target.value);
+  };
+
+  const createNewFolder = e => {
+    e.preventDefault();
+    console.log(e.target.folderName.value);
+  };
+
   return (
-    <IonContent color="primary">
-      <StyledModal isOpen={showNewFolderModal} color="primary">
+    <StyledModal isOpen={showNewFolderModal} color="primary">
+      <StyledForm onSubmit={createNewFolder}>
         <IonHeader>
           <IonToolbar color="primary">
             <IonButtons slot="start">
               <IonButton
                 onClick={() => onShowNewFolderModalChange(false)}
                 color="danger"
+                type="button"
               >
                 Zrušit
               </IonButton>
@@ -33,14 +48,23 @@ const NewFolderModal = ({ showNewFolderModal, onShowNewFolderModalChange }) => {
               <IonButton
                 onClick={() => onShowNewFolderModalChange(false)}
                 color="success"
+                type="submit"
               >
                 Vytvořit
               </IonButton>
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-      </StyledModal>
-    </IonContent>
+        <IonContent color="primary">
+          <IonInput
+            placeholder="Zadejte název složky"
+            value={newFolderInput}
+            onChange={handleFolderInputChange}
+            name="folderName"
+          ></IonInput>
+        </IonContent>
+      </StyledForm>
+    </StyledModal>
   );
 };
 
