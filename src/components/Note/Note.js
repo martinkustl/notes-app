@@ -12,18 +12,26 @@ import {
   IonBackButton,
   useIonViewWillEnter,
   useIonViewWillLeave,
-  IonImg
+  IonImg,
+  IonFooter
 } from '@ionic/react';
 
 const Note = ({ onIsNoteOpenChange }) => {
   const [photoUrl, setPhotoUrl] = useState();
+  const [hideActionButtons, setHideActionButtons] = useState(false);
 
   useIonViewWillEnter(() => {
     onIsNoteOpenChange(true);
   });
 
   useIonViewWillLeave(() => {
-    onIsNoteOpenChange(false);
+    setHideActionButtons(false);
+    // onIsNoteOpenChange(false);
+    try {
+      setTimeout(() => {
+        onIsNoteOpenChange(false);
+      }, 400);
+    } catch (err) {}
   });
 
   const onPhotoUrlChange = state => {
@@ -40,11 +48,15 @@ const Note = ({ onIsNoteOpenChange }) => {
           <IonTitle>Poznámka</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent color="primary" className="ion-padding" fullscreen>
+      <IonContent color="primary" /* className="ion-padding"  */ fullscreen>
         První poznámka
         {photoUrl && <IonImg src={photoUrl} />}
       </IonContent>
-      <NoteActionButtons onPhotoUrlChange={onPhotoUrlChange} />
+      <IonFooter>
+        {!hideActionButtons && (
+          <NoteActionButtons onPhotoUrlChange={onPhotoUrlChange} />
+        )}
+      </IonFooter>
     </IonPage>
   );
 };

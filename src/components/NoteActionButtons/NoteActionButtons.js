@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { IonIcon, IonRippleEffect, IonButton, isPlatform } from '@ionic/react';
+import { IonIcon, IonRippleEffect, isPlatform } from '@ionic/react';
 
 import { microphone, images } from 'ionicons/icons';
 

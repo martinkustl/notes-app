@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
@@ -42,19 +42,6 @@ import './theme/variables.css';
 
 import NewNoteModal from './components/NewNoteModal/NewNoteModal';
 
-/* const StyledAddTabButton = styled(IonButton)`
-  --padding-start: 0;
-  --padding-end: 0;
-  font-size: 22px;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-`;
-
-const StyledAddIcon = styled(IonIcon)`
-  padding-top: 2px;
-`; */
-
 const StyledAddTabButton = styled(IonTabButton)`
   --color: var(--ion-color-success);
 `;
@@ -66,45 +53,48 @@ const App = props => {
   useEffect(() => {
     console.log(props);
   });
+  let tabButtons;
 
-  const onIsNoteOpenChange = state => setIsNoteOpen(state);
+  tabButtons = (
+    <IonTabBar slot="bottom">
+      <IonTabButton tab="home" href="/home" color="secondary">
+        <IonIcon icon={home} />
+      </IonTabButton>
+      <IonTabButton tab="search" href="/search">
+        <IonIcon icon={search} />
+      </IonTabButton>
+      <IonTabButton tab="add">
+        <StyledAddTabButton onClick={() => onShowNewNoteModalChange(true)}>
+          <IonIcon icon={addCircleOutline} />
+        </StyledAddTabButton>
+        <NewNoteModal
+          showNewNoteModal={showNewNoteModal}
+          onShowNewNoteModalChange={setShowNewNoteModal}
+        />
+      </IonTabButton>
+      <IonTabButton tab="shared" href="/shared">
+        <IonIcon icon={people} />
+      </IonTabButton>
+    </IonTabBar>
+  );
 
-  let tabBar;
+  const hideMainTabs = hide => {
+    if (hide) {
+      tabButtons = <IonTabBar></IonTabBar>;
+    }
+  };
+
+  const onShowNewNoteModalChange = state => {
+    setShowNewNoteModal(state);
+  };
+
+  const onIsNoteOpenChange = state => {
+    hideMainTabs(state);
+    setIsNoteOpen(state);
+  };
+
   if (isNoteOpen) {
-    tabBar = <IonTabBar></IonTabBar>;
-  } else {
-    tabBar = (
-      <IonTabBar slot="bottom">
-        <IonTabButton tab="home" href="/home" color="secondary">
-          <IonIcon icon={home} />
-        </IonTabButton>
-        <IonTabButton tab="search" href="/search">
-          <IonIcon icon={search} />
-        </IonTabButton>
-        <IonTabButton tab="add">
-          {/* <StyledAddTabButton
-            onClick={() => setShowNewNoteModal(true)}
-            color="success"
-            fill="clear"
-          >
-            <IonIcon icon={addCircleOutline} />
-          </StyledAddTabButton> */}
-          <StyledAddTabButton onClick={() => setShowNewNoteModal(true)}>
-            <IonIcon icon={addCircleOutline} />
-          </StyledAddTabButton>
-          <NewNoteModal
-            showNewNoteModal={showNewNoteModal}
-            onShowNewNoteModalChange={setShowNewNoteModal}
-          />
-        </IonTabButton>
-        {/* <IonTabButton tab="private" href="/private-notes">
-          <IonIcon icon={lock} />
-        </IonTabButton> */}
-        <IonTabButton tab="shared" href="/shared">
-          <IonIcon icon={people} />
-        </IonTabButton>
-      </IonTabBar>
-    );
+    tabButtons = <IonTabBar></IonTabBar>;
   }
 
   return (
@@ -134,7 +124,7 @@ const App = props => {
               exact={true}
             />
           </IonRouterOutlet>
-          {tabBar}
+          {tabButtons}
         </IonTabs>
       </IonReactRouter>
     </IonApp>

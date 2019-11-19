@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import * as firebase from 'firebase';
+
 import {
   IonContent,
   IonHeader,
@@ -12,7 +14,8 @@ import {
   IonLabel,
   IonItem,
   IonIcon,
-  IonButton
+  IonButton,
+  useIonViewWillEnter
 } from '@ionic/react';
 
 import { add, more } from 'ionicons/icons';
@@ -37,12 +40,32 @@ const StyledCircle = styled.div`
   margin-right: 0.4rem;
 `;
 
-const foldersArray = ['První složka', 'Druhá složka', 'Třetí složka'];
-
-const notesArray = ['První poznámka', 'Druhá poznámka', 'Třetí poznámka'];
-
 const Home = () => {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
+  const [notes, setNotes] = useState([]);
+  const [folders, setFolders] = useState([]);
+
+  useIonViewWillEnter(() => {
+    let fetchedNotes = [];
+    let fetchedFolders = [];
+    // UNCOMMENT FOR FETCHING NOTES & FOLDERS
+    firebase
+      .firestore()
+      .collection('notes')
+      .onSnapshot(snapshot => {
+        snapshot.forEach(doc => fetchedNotes.push(doc.data()));
+        setNotes([...fetchedNotes]);
+        fetchedNotes = [];
+      });
+    firebase
+      .firestore()
+      .collection('folders')
+      .onSnapshot(snapshot => {
+        snapshot.forEach(doc => fetchedFolders.push(doc.data()));
+        setFolders([...fetchedFolders]);
+        fetchedFolders = [];
+      });
+  });
 
   return (
     <IonPage>
@@ -70,33 +93,35 @@ const Home = () => {
             showNewFolderModal={showNewFolderModal}
             onShowNewFolderModalChange={setShowNewFolderModal}
           />
-          {foldersArray.map((folder, index) => {
-            return (
-              <IonItem key={index}>
-                <StyledCircle />
-                <IonLabel>{folder}</IonLabel>
-                <StyledOptionsButton fill="clear">
-                  <IonIcon icon={more} />
-                </StyledOptionsButton>
-              </IonItem>
-            );
-          })}
+          {folders &&
+            folders.map((folder, index) => {
+              return (
+                <IonItem key={index}>
+                  <StyledCircle />
+                  <IonLabel>{folder.name}</IonLabel>
+                  <StyledOptionsButton fill="clear">
+                    <IonIcon icon={more} />
+                  </StyledOptionsButton>
+                </IonItem>
+              );
+            })}
         </StyledIonList>
         <StyledIonList color="primary">
           <IonListHeader color="primary">Nepřiřazené poznámky</IonListHeader>
-          {notesArray.map((note, index) => {
-            return (
-              <IonItem
-                routerDirection="forward"
-                routerLink="/note/:id"
-                key={index}
-                detail
-              >
-                <StyledCircle />
-                {note}
-              </IonItem>
-            );
-          })}
+          {notes &&
+            notes.map((note, index) => {
+              return (
+                <IonItem
+                  routerDirection="forward"
+                  routerLink="/note/:id"
+                  key={index}
+                  detail
+                >
+                  <StyledCircle />
+                  {note.text}
+                </IonItem>
+              );
+            })}
         </StyledIonList>
       </IonContent>
     </IonPage>
