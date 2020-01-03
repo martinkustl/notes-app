@@ -46,7 +46,11 @@ const NewFolderModal = ({ showNewFolderModal, onShowNewFolderModalChange }) => {
   };
 
   return (
-    <StyledModal isOpen={showNewFolderModal} color="primary">
+    <StyledModal
+      isOpen={showNewFolderModal}
+      color="primary"
+      backdropDismiss={false}
+    >
       {/* <StyledForm onSubmit={createNewFolder}>
         <IonHeader>
           <IonToolbar color="primary">
@@ -108,8 +112,7 @@ const NewFolderModal = ({ showNewFolderModal, onShowNewFolderModalChange }) => {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent color="primary" className="ion-padding" fullscreen>
-          Some content
+        <IonContent color="primary" className="ion-padding" fullscreen={true}>
           <IonInput
             placeholder="Zadejte název složky"
             value={newFolderInput}

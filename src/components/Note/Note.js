@@ -30,7 +30,7 @@ const Note = ({ onIsNoteOpenChange }) => {
     try {
       setTimeout(() => {
         onIsNoteOpenChange(false);
-      }, 400);
+      }, 300);
     } catch (err) {}
   });
 
@@ -48,7 +48,7 @@ const Note = ({ onIsNoteOpenChange }) => {
           <IonTitle>Poznámka</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent color="primary" /* className="ion-padding"  */ fullscreen>
+      <IonContent color="primary" className="ion-padding" fullscreen={true}>
         První poznámka
         {photoUrl && <IonImg src={photoUrl} />}
       </IonContent>

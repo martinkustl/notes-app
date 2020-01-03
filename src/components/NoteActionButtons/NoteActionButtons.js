@@ -56,12 +56,12 @@ const NoteActionButtons = ({ onPhotoUrlChange }) => {
           <IonRippleEffect type="bounded"></IonRippleEffect>
         )}
       </StyledCustomButton>
-      <StyledCustomButton className="ion-activatable">
+      {/*  <StyledCustomButton className="ion-activatable">
         <IonIcon icon={microphone} size="large" />
         {mode === 'android' && (
           <IonRippleEffect type="bounded"></IonRippleEffect>
         )}
-      </StyledCustomButton>
+      </StyledCustomButton> */}
     </StyledNoteCustomFooter>
   );
 };

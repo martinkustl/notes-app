@@ -6,8 +6,7 @@ import {
   IonRouterOutlet,
   IonTabBar,
   IonTabButton,
-  IonTabs,
-  IonButton
+  IonTabs
 } from '@ionic/react';
 import { addCircleOutline, search, people, home, lock } from 'ionicons/icons';
 
@@ -20,6 +19,7 @@ import Search from './pages/Search';
 import Shared from './pages/Shared';
 import PrivateNotes from './pages/PrivateNotes';
 import Note from './components/Note/Note';
+import Auth from './Auth/Auth';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -49,6 +49,8 @@ const StyledAddTabButton = styled(IonTabButton)`
 const App = props => {
   const [showNewNoteModal, setShowNewNoteModal] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
+
+  const isAuthenticated = false;
 
   useEffect(() => {
     console.log(props);
@@ -97,9 +99,16 @@ const App = props => {
     tabButtons = <IonTabBar></IonTabBar>;
   }
 
-  return (
-    <IonApp>
-      <IonReactRouter>
+  let routes = (
+    <IonRouterOutlet id="main">
+      <Route path="/auth" component={Auth} />
+      <Route path="/" render={() => <Redirect to="/auth" />} exact={true} />
+    </IonRouterOutlet>
+  );
+
+  if (isAuthenticated) {
+    routes = (
+      <Fragment>
         <HomeMenu contentId="main" />
         <IonTabs>
           <IonRouterOutlet id="main">
@@ -126,7 +135,13 @@ const App = props => {
           </IonRouterOutlet>
           {tabButtons}
         </IonTabs>
-      </IonReactRouter>
+      </Fragment>
+    );
+  }
+
+  return (
+    <IonApp>
+      <IonReactRouter>{routes}</IonReactRouter>
     </IonApp>
   );
 };

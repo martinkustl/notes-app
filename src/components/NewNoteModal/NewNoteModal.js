@@ -9,7 +9,9 @@ import {
   IonTitle,
   IonIcon,
   IonTextarea,
-  IonImg
+  IonImg,
+  IonFooter,
+  useIonViewDidLeave
 } from '@ionic/react';
 import * as firebase from 'firebase';
 
@@ -23,8 +25,17 @@ const StyledModal = styled(IonModal)`
   --background: var(--ion-color-primary);
 `;
 
+const StyledMainIonContent = styled(IonContent)`
+  --padding-top: 0;
+`;
+
 const NewFolderModal = ({ showNewNoteModal, onShowNewNoteModalChange }) => {
   const [photoUrl, setPhotoUrl] = useState();
+  const [noteText, setNoteText] = useState();
+
+  useIonViewDidLeave(() => {
+    setNoteText();
+  });
 
   const onPhotoUrlChange = state => {
     setPhotoUrl(state);
@@ -48,45 +59,55 @@ const NewFolderModal = ({ showNewNoteModal, onShowNewNoteModalChange }) => {
       .catch(err => console.log(err));
   };
 
+  const handleNoteTextChange = e => {
+    setNoteText(e.target.value);
+  };
+
   return (
     <StyledModal isOpen={showNewNoteModal} color="primary">
-      <form onSubmit={createNote}>
-        <IonHeader>
-          <IonToolbar color="primary">
-            <IonButtons slot="start">
-              <IonButton
-                onClick={() => onShowNewNoteModalChange(false)}
-                color="danger"
-                shape="round"
-                type="button"
-              >
-                <IonIcon icon={close} />
-              </IonButton>
-            </IonButtons>
-            <IonTitle>Nová poznámka</IonTitle>
-            <IonButtons slot="end">
-              <IonButton
-                onClick={() => onShowNewNoteModalChange(false)}
-                color="success"
-                type="submit"
-              >
-                Vytvořit
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent color="primary" className="ion-padding">
-          <IonTextarea
-            autoGrow={true}
-            autofocus={true}
-            spellCheck={true}
-            autoCorrect
-            name="textArea"
-          ></IonTextarea>
-          {photoUrl && <IonImg src={photoUrl} />}
-        </IonContent>
-      </form>
-      <NoteActionButtons onPhotoUrlChange={onPhotoUrlChange} />
+      <StyledMainIonContent color="primary" fullscreen={true}>
+        <form onSubmit={createNote}>
+          <IonHeader>
+            <IonToolbar color="primary">
+              <IonButtons slot="start">
+                <IonButton
+                  onClick={() => onShowNewNoteModalChange(false)}
+                  color="danger"
+                  shape="round"
+                  type="button"
+                >
+                  <IonIcon icon={close} />
+                </IonButton>
+              </IonButtons>
+              <IonTitle>Nová poznámka</IonTitle>
+              <IonButtons slot="end">
+                <IonButton
+                  onClick={() => onShowNewNoteModalChange(false)}
+                  color="success"
+                  type="submit"
+                >
+                  Vytvořit
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding" color="primary">
+            <IonTextarea
+              autoGrow={true}
+              autofocus={true}
+              spellCheck={true}
+              autoCorrect
+              value={noteText}
+              onChange={handleNoteTextChange}
+              name="textArea"
+            ></IonTextarea>
+            {photoUrl && <IonImg src={photoUrl} />}
+          </IonContent>
+        </form>
+      </StyledMainIonContent>
+      <IonFooter>
+        <NoteActionButtons onPhotoUrlChange={onPhotoUrlChange} />
+      </IonFooter>
     </StyledModal>
   );
 };

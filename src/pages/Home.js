@@ -53,6 +53,7 @@ const Home = () => {
       .firestore()
       .collection('notes')
       .onSnapshot(snapshot => {
+        console.log(snapshot);
         snapshot.forEach(doc => fetchedNotes.push(doc.data()));
         setNotes([...fetchedNotes]);
         fetchedNotes = [];
@@ -66,6 +67,10 @@ const Home = () => {
         fetchedFolders = [];
       });
   });
+
+  /* const onOpenNewFolderModal = state => {
+    setShowNewFolderModal(state);
+  }; */
 
   return (
     <IonPage>
@@ -84,7 +89,9 @@ const Home = () => {
             <IonButton
               color="success"
               fill="clear"
-              onClick={() => setShowNewFolderModal(true)}
+              onClick={() => {
+                setShowNewFolderModal(true);
+              }}
             >
               <IonIcon icon={add} />
             </IonButton>
