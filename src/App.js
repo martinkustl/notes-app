@@ -1,5 +1,8 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import React, { useState, Fragment } from 'react';
+import { Route } from 'react-router-dom';
+
+import { connect } from 'react-redux';
+
 import {
   IonApp,
   IonIcon,
@@ -8,7 +11,7 @@ import {
   IonTabButton,
   IonTabs
 } from '@ionic/react';
-import { addCircleOutline, search, people, home, lock } from 'ionicons/icons';
+import { addCircleOutline, search, people, home } from 'ionicons/icons';
 
 import styled from 'styled-components';
 
@@ -17,7 +20,6 @@ import HomeMenu from './components/HomeMenu/HomeMenu';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Shared from './pages/Shared';
-import PrivateNotes from './pages/PrivateNotes';
 import Note from './components/Note/Note';
 import Auth from './Auth/Auth';
 
@@ -46,15 +48,10 @@ const StyledAddTabButton = styled(IonTabButton)`
   --color: var(--ion-color-success);
 `;
 
-const App = props => {
+const App = ({ auth }) => {
   const [showNewNoteModal, setShowNewNoteModal] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
 
-  const isAuthenticated = false;
-
-  useEffect(() => {
-    console.log(props);
-  });
   let tabButtons;
 
   tabButtons = (
@@ -101,18 +98,19 @@ const App = props => {
 
   let routes = (
     <IonRouterOutlet id="main">
-      <Route path="/auth" component={Auth} />
-      <Route path="/" render={() => <Redirect to="/auth" />} exact={true} />
+      {/* <Route path="/auth" component={Auth} /> */}
+      {/* <Route path="/" render={() => <Redirect to="/auth" />} exact={true} /> */}
+      <Route path="/" component={Auth} />
     </IonRouterOutlet>
   );
 
-  if (isAuthenticated) {
+  if (auth.uid) {
     routes = (
       <Fragment>
         <HomeMenu contentId="main" />
         <IonTabs>
           <IonRouterOutlet id="main">
-            <Route path="/home" exact={true} component={Home} />
+            {/* <Route path="/home" exact={true} component={Home} /> */}
             <Route
               path="/note/:id"
               exact={true}
@@ -121,15 +119,11 @@ const App = props => {
               )}
             />
             <Route path="/search" component={Search} exact={true} />
-            <Route
-              path="/private-notes"
-              component={PrivateNotes}
-              exact={true}
-            />
             <Route path="/shared" component={Shared} exact={true} />
             <Route
               path="/"
-              render={() => <Redirect to="/home" />}
+              /* render={() => <Redirect to="/home" />} */
+              component={Home}
               exact={true}
             />
           </IonRouterOutlet>
@@ -146,4 +140,10 @@ const App = props => {
   );
 };
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    auth: state.firebase.auth
+  };
+};
+
+export default connect(mapStateToProps)(App);

@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+
+import { connect } from 'react-redux';
+import * as actionCreators from '../../store/actions/index';
+
 import {
   IonModal,
   IonButton,
@@ -13,7 +17,6 @@ import {
   IonFooter,
   useIonViewDidLeave
 } from '@ionic/react';
-import * as firebase from 'firebase';
 
 import { close } from 'ionicons/icons';
 
@@ -29,7 +32,12 @@ const StyledMainIonContent = styled(IonContent)`
   --padding-top: 0;
 `;
 
-const NewFolderModal = ({ showNewNoteModal, onShowNewNoteModalChange }) => {
+const NewNoteModal = ({
+  showNewNoteModal,
+  onShowNewNoteModalChange,
+  auth,
+  onCreateNote
+}) => {
   const [photoUrl, setPhotoUrl] = useState();
   const [noteText, setNoteText] = useState();
 
@@ -43,7 +51,7 @@ const NewFolderModal = ({ showNewNoteModal, onShowNewNoteModalChange }) => {
 
   const createNote = e => {
     e.preventDefault();
-    firebase
+    /* firebase
       .firestore()
       .collection('notes')
       .add({
@@ -56,7 +64,19 @@ const NewFolderModal = ({ showNewNoteModal, onShowNewNoteModalChange }) => {
         console.log(res);
         //I will get document as response. Document is something like raw in SQL
       })
-      .catch(err => console.log(err));
+      .catch(err => console.log(err)); */
+    const note = {
+      heading: 'some heading',
+      content: e.target.textArea.value
+    };
+
+    /*    ownerId: note.uid,
+        ownerName: note.userName,
+        content: note.content,
+        createdAt: new Date(),
+        heading: note.heading */
+
+    onCreateNote(note);
   };
 
   const handleNoteTextChange = e => {
@@ -112,4 +132,16 @@ const NewFolderModal = ({ showNewNoteModal, onShowNewNoteModalChange }) => {
   );
 };
 
-export default NewFolderModal;
+const mapStateToProps = state => {
+  return {
+    auth: state.firebase
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onCreateNote: note => dispatch(actionCreators.createNote(note))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewNoteModal);

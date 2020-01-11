@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import * as firebase from 'firebase';
+import { connect } from 'react-redux';
+import * as actionCreators from '../store/actions/index';
 
 import Input from '../UI/Input';
 
@@ -27,8 +28,16 @@ const StyledCenterItems = styled.div`
   width: 100%;
 `;
 
-const Auth = () => {
-  const [authForm, setAuthForm] = useState({
+const StyledSubmitBtn = styled(IonButton)``;
+
+const StyledForm = styled.form`
+  margin-bottom: 24px;
+`;
+
+const Auth = ({ onLogin, onSignUp }) => {
+  const [isValid, setIsValid] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true);
+  const [signUpForm, setSignUpForm] = useState({
     name: {
       elementType: 'input',
       elementConfig: {
@@ -83,6 +92,36 @@ const Auth = () => {
       touched: false
     }
   });
+  const [loginForm, setLoginForm] = useState({
+    email: {
+      elementType: 'input',
+      elementConfig: {
+        type: 'email'
+      },
+      label: 'E-mail',
+      value: '',
+      validation: {
+        required: true,
+        isEmail: true
+      },
+      valid: false,
+      touched: false
+    },
+    password: {
+      elementType: 'input',
+      elementConfig: {
+        type: 'password'
+      },
+      label: 'Heslo',
+      value: '',
+      validation: {
+        required: true,
+        minLength: 6
+      },
+      valid: false,
+      touched: false
+    }
+  });
 
   const checkValidity = (value, rules) => {
     let isValid = true;
@@ -113,53 +152,154 @@ const Auth = () => {
     }
 
     if (rules.isSame) {
-      isValid = value === authForm.password.value;
+      isValid = value === signUpForm.password.value;
     }
 
     return isValid;
   };
 
-  const inputChangedHandler = (event, controlName) => {
+  const inputChangedHandler = (event, controlName, state, setState) => {
     const updatedControls = {
-      ...authForm,
+      ...state,
       [controlName]: {
-        ...authForm[controlName],
+        ...state[controlName],
         value: event.target.value,
-        valid: checkValidity(
-          event.target.value,
-          authForm[controlName].validation
-        ),
+        valid: checkValidity(event.target.value, state[controlName].validation),
         touched: true
       }
     };
-    setAuthForm(updatedControls);
+    let formIsValid = true;
+    for (let inputId in updatedControls) {
+      formIsValid = updatedControls[inputId].valid && formIsValid;
+    }
+    setIsValid(formIsValid);
+    setState(updatedControls);
   };
 
-  const formElementsArray = [];
-  for (let key in authForm) {
-    formElementsArray.push({
-      id: key,
-      config: authForm[key]
+  const submitSignUp = e => {
+    e.preventDefault();
+    onSignUp({
+      email: signUpForm.email.value,
+      password: signUpForm.password.value,
+      name: signUpForm.name.value
     });
-  }
+  };
 
-  let form = formElementsArray.map(formElement => (
-    <IonItem key={formElement.id}>
-      <IonLabel position="floating">
-        <IonText color="dark">{formElement.config.label}</IonText>
-        <IonText color="danger">*</IonText>
-      </IonLabel>
-      <Input
-        elementType={formElement.config.elementType}
-        elementConfig={formElement.config.elementConfig}
-        value={formElement.config.value}
-        invalid={!formElement.config.valid}
-        shouldValidate={formElement.config.validation}
-        touched={formElement.config.touched}
-        changed={event => inputChangedHandler(event, formElement.id)}
-      />
-    </IonItem>
-  ));
+  const submitLogin = e => {
+    e.preventDefault();
+    onLogin({
+      email: loginForm.email.value,
+      password: loginForm.password.value
+    });
+  };
+
+  const switchForm = () => {
+    setIsSignUp(prevState => !prevState);
+  };
+
+  let form = null;
+
+  if (isSignUp) {
+    const formElementsArray = [];
+    for (let key in signUpForm) {
+      formElementsArray.push({
+        id: key,
+        config: signUpForm[key]
+      });
+    }
+
+    form = (
+      <StyledForm onSubmit={submitSignUp}>
+        <StyledIonList lines="full">
+          {formElementsArray.map(formElement => (
+            <IonItem key={formElement.id}>
+              <IonLabel position="floating">
+                <IonText color="dark">{formElement.config.label}</IonText>
+                <IonText color="danger">*</IonText>
+              </IonLabel>
+              <Input
+                elementType={formElement.config.elementType}
+                elementConfig={formElement.config.elementConfig}
+                value={formElement.config.value}
+                invalid={!formElement.config.valid}
+                shouldValidate={formElement.config.validation}
+                touched={formElement.config.touched}
+                changed={event =>
+                  inputChangedHandler(
+                    event,
+                    formElement.id,
+                    signUpForm,
+                    setSignUpForm
+                  )
+                }
+              />
+            </IonItem>
+          ))}
+        </StyledIonList>
+        <StyledCenterItems>
+          <StyledSubmitBtn
+            color="success"
+            fill="outline"
+            shape="round"
+            type="submit"
+            disabled={!isValid}
+          >
+            Registrovat
+          </StyledSubmitBtn>
+        </StyledCenterItems>
+      </StyledForm>
+    );
+  } else {
+    const formElementsArray = [];
+    for (let key in loginForm) {
+      formElementsArray.push({
+        id: key,
+        config: loginForm[key]
+      });
+    }
+
+    form = (
+      <StyledForm onSubmit={submitLogin}>
+        <StyledIonList lines="full">
+          {formElementsArray.map(formElement => (
+            <IonItem key={formElement.id}>
+              <IonLabel position="floating">
+                <IonText color="dark">{formElement.config.label}</IonText>
+                <IonText color="danger">*</IonText>
+              </IonLabel>
+              <Input
+                elementType={formElement.config.elementType}
+                elementConfig={formElement.config.elementConfig}
+                value={formElement.config.value}
+                invalid={!formElement.config.valid}
+                shouldValidate={formElement.config.validation}
+                touched={formElement.config.touched}
+                changed={event =>
+                  inputChangedHandler(
+                    event,
+                    formElement.id,
+                    loginForm,
+                    setLoginForm
+                  )
+                }
+              />
+            </IonItem>
+          ))}
+        </StyledIonList>
+        <StyledCenterItems>
+          <StyledSubmitBtn
+            color="success"
+            fill="outline"
+            shape="round"
+            type="submit"
+            disabled={!isValid}
+          >
+            Přihlásit se
+          </StyledSubmitBtn>
+        </StyledCenterItems>
+      </StyledForm>
+    );
+  }
 
   return (
     <IonPage>
@@ -169,42 +309,11 @@ const Auth = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen color="primary">
-        <form>
-          <StyledIonList lines="full">
-            {form}
-            {/* <IonItem>
-              <IonLabel position="floating">
-                <IonText color="dark">E-mail</IonText>
-                <IonText color="danger">*</IonText>
-              </IonLabel>
-              <IonInput required type="text" color="dark"></IonInput>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="floating">
-                <IonText color="dark">Jméno</IonText>
-                <IonText color="danger">*</IonText>
-              </IonLabel>
-              <IonInput required type="text"></IonInput>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="floating">
-                <IonText color="dark">Heslo</IonText>
-                <IonText color="danger">*</IonText>
-              </IonLabel>
-              <IonInput required type="password"></IonInput>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="floating">
-                <IonText color="dark">Heslo znovu</IonText>
-                <IonText color="danger">*</IonText>
-              </IonLabel>
-              <IonInput required type="password"></IonInput>
-            </IonItem> */}
-          </StyledIonList>
-        </form>
+        {form}
         <StyledCenterItems>
-          <IonButton color="secondary" fill="outline" shape="round">
-            Registrovat
+          <IonButton color="secondary" fill="clear" onClick={switchForm}>
+            Přepnout na
+            {isSignUp ? ' přihlášení' : ' registraci'}
           </IonButton>
         </StyledCenterItems>
       </IonContent>
@@ -212,4 +321,13 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+const mapDispatchToProps = dispatch => {
+  return {
+    /* onAuth: (email, password, isSignUp) =>
+      dispatch(actionCreators.auth(email, password, isSignUp)), */
+    onLogin: creds => dispatch(actionCreators.login(creds)),
+    onSignUp: newUser => dispatch(actionCreators.signUp(newUser))
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Auth);

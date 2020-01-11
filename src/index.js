@@ -4,6 +4,19 @@ import App from './App';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
 import * as firebase from 'firebase';
+import { ReactReduxFirebaseProvider, getFirebase } from 'react-redux-firebase';
+import { createFirestoreInstance } from 'redux-firestore';
+import { firebaseReducer } from 'react-redux-firebase';
+import { firestoreReducer } from 'redux-firestore';
+
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+
+import authReducer from './store/reducers/auth';
+import notesReducer from './store/reducers/notes';
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 var firebaseConfig = {
   apiKey: 'AIzaSyDoHpFtpt9IUkjNzzkD8MP1Ezgzx_EafWA',
@@ -17,11 +30,42 @@ var firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+firebase.firestore();
+
+const rootReducer = combineReducers({
+  auth: authReducer,
+  notes: notesReducer,
+  firebase: firebaseReducer,
+  firestore: firestoreReducer
+});
+
+const store = createStore(
+  rootReducer,
+  composeEnhancers(applyMiddleware(thunk.withExtraArgument(getFirebase)))
+);
+
+const rrfConfig = { userProfile: 'users', useFirestoreForProfile: true };
+
+const rrfProps = {
+  firebase,
+  config: rrfConfig,
+  dispatch: store.dispatch,
+  createFirestoreInstance
+};
+
 /* firebase.firestore().settings({
   //I'm using the firebase timestamp function
   timestampsInSnapshots: true
 }); */
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+    <ReactReduxFirebaseProvider {...rrfProps}>
+      <App />
+    </ReactReduxFirebaseProvider>
+  </Provider>,
+  document.getElementById('root')
+);
 
 defineCustomElements(window); // add PWA functionality

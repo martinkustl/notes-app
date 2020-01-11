@@ -10,7 +10,14 @@ import {
 import React from 'react';
 import { StyledIonList } from '../../styles';
 
-const HomeMenu = () => {
+import { connect } from 'react-redux';
+import * as actionCreators from '../../store/actions/index';
+
+const HomeMenu = ({ onLogout }) => {
+  const logoutClick = () => {
+    onLogout();
+  };
+
   return (
     <IonMenu contentId="main" type="overlay" color="primary">
       <IonHeader color="primary">
@@ -23,7 +30,7 @@ const HomeMenu = () => {
           <IonItem color="primary">Upravit barvy štítků</IonItem>
           <IonItem color="primary">Můj profil</IonItem>
         </StyledIonList>
-        <IonButton color="danger" fill="clear">
+        <IonButton color="danger" fill="clear" onClick={logoutClick}>
           Odhlásit
         </IonButton>
       </IonContent>
@@ -31,4 +38,10 @@ const HomeMenu = () => {
   );
 };
 
-export default HomeMenu;
+const mapDispatchToProps = dispatch => {
+  return {
+    onLogout: () => dispatch(actionCreators.logout())
+  };
+};
+
+export default connect(null, mapDispatchToProps)(HomeMenu);

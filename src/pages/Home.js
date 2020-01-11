@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
-import * as firebase from 'firebase';
+import { connect } from 'react-redux';
+import * as actionCreators from '../store/actions/index';
+import { compose } from 'redux';
+import { firestoreConnect } from 'react-redux-firebase';
 
 import {
   IonContent,
@@ -14,8 +17,7 @@ import {
   IonLabel,
   IonItem,
   IonIcon,
-  IonButton,
-  useIonViewWillEnter
+  IonButton
 } from '@ionic/react';
 
 import { add, more } from 'ionicons/icons';
@@ -40,33 +42,10 @@ const StyledCircle = styled.div`
   margin-right: 0.4rem;
 `;
 
-const Home = () => {
+const Home = ({ notes }) => {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
-  const [notes, setNotes] = useState([]);
+  // const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
-
-  useIonViewWillEnter(() => {
-    let fetchedNotes = [];
-    let fetchedFolders = [];
-    // UNCOMMENT FOR FETCHING NOTES & FOLDERS
-    firebase
-      .firestore()
-      .collection('notes')
-      .onSnapshot(snapshot => {
-        console.log(snapshot);
-        snapshot.forEach(doc => fetchedNotes.push(doc.data()));
-        setNotes([...fetchedNotes]);
-        fetchedNotes = [];
-      });
-    firebase
-      .firestore()
-      .collection('folders')
-      .onSnapshot(snapshot => {
-        snapshot.forEach(doc => fetchedFolders.push(doc.data()));
-        setFolders([...fetchedFolders]);
-        fetchedFolders = [];
-      });
-  });
 
   /* const onOpenNewFolderModal = state => {
     setShowNewFolderModal(state);
@@ -125,7 +104,7 @@ const Home = () => {
                   detail
                 >
                   <StyledCircle />
-                  {note.text}
+                  {note.content}
                 </IonItem>
               );
             })}
@@ -135,4 +114,13 @@ const Home = () => {
   );
 };
 
-export default Home;
+const mapStateToProps = state => {
+  return {
+    notes: state.firestore.ordered.notes
+  };
+};
+
+export default compose(
+  connect(mapStateToProps),
+  firestoreConnect(() => [{ collection: 'notes' }])
+)(Home);
