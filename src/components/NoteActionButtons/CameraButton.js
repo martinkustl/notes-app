@@ -27,7 +27,7 @@ const StyledCustomButton = styled.button`
   }
 `;
 
-const CameraButton = ({ onPhotoUrlChange, mode }) => {
+const CameraButton = ({ /* onPhotoUrlChange */ mode }) => {
   // const [photoUrl, setPhotoUrl] = useState();
   //const [cameraAccessible, setCameraAccessible] = useState(true);
   useEffect(() => {
@@ -64,7 +64,7 @@ const CameraButton = ({ onPhotoUrlChange, mode }) => {
         resultType: CameraResultType.DataUrl
       })
         .then(photo => {
-          onPhotoUrlChange(photo.dataUrl);
+          //onPhotoUrlChange(photo.dataUrl);
         })
         .catch(error => {
           // in case I can't take image

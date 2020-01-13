@@ -38,7 +38,11 @@ const StyledCustomButton = styled.button`
   }
 `;
 
-const NoteActionButtons = ({ onPhotoUrlChange }) => {
+const NoteActionButtons = (
+  {
+    /* onPhotoUrlChange */
+  }
+) => {
   const [mode, setMode] = useState();
 
   useEffect(() => {
@@ -49,7 +53,7 @@ const NoteActionButtons = ({ onPhotoUrlChange }) => {
 
   return (
     <StyledNoteCustomFooter>
-      <CameraButton onPhotoUrlChange={onPhotoUrlChange} mode={mode} />
+      <CameraButton /* onPhotoUrlChange={onPhotoUrlChange} */ mode={mode} />
       <StyledCustomButton className="ion-activatable">
         <IonIcon icon={images} size="large" />
         {mode === 'android' && (

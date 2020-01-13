@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { connect } from 'react-redux';
 import * as actionCreators from '../../store/actions/index';
@@ -12,6 +12,7 @@ import {
   IonButtons,
   IonTitle,
   IonIcon,
+  IonInput,
   IonTextarea,
   IonImg,
   IonFooter,
@@ -39,6 +40,7 @@ const NewNoteModal = ({
   onCreateNote
 }) => {
   const [photoUrl, setPhotoUrl] = useState();
+  const [noteHeading, setNoteHeading] = useState();
   const [noteText, setNoteText] = useState();
 
   useIonViewDidLeave(() => {
@@ -66,8 +68,8 @@ const NewNoteModal = ({
       })
       .catch(err => console.log(err)); */
     const note = {
-      heading: 'some heading',
-      content: e.target.textArea.value
+      heading: noteHeading,
+      content: noteText
     };
 
     /*    ownerId: note.uid,
@@ -77,6 +79,10 @@ const NewNoteModal = ({
         heading: note.heading */
 
     onCreateNote(note);
+  };
+
+  const handleNoteHeadingChange = e => {
+    setNoteHeading(e.target.value);
   };
 
   const handleNoteTextChange = e => {
@@ -111,15 +117,25 @@ const NewNoteModal = ({
               </IonButtons>
             </IonToolbar>
           </IonHeader>
-          <IonContent className="ion-padding" color="primary">
+          <IonContent className="ion-padding" color="primary" fullscreen={true}>
+            <IonInput
+              type="string"
+              placeholder="Nadpis"
+              value={noteHeading}
+              name="heading"
+              onIonChange={handleNoteHeadingChange}
+              required
+            />
             <IonTextarea
               autoGrow={true}
               autofocus={true}
               spellCheck={true}
               autoCorrect
               value={noteText}
-              onChange={handleNoteTextChange}
+              onIonChange={handleNoteTextChange}
               name="textArea"
+              placeholder="Obsah poznámky"
+              required
             ></IonTextarea>
             {photoUrl && <IonImg src={photoUrl} />}
           </IonContent>

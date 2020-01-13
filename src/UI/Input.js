@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { IonInput } from '@ionic/react';
+import { IonInput, IonTextarea } from '@ionic/react';
 
 const Input = props => {
   let inputElement = null;
@@ -14,6 +14,9 @@ const Input = props => {
           onIonChange={props.changed}
         />
       );
+      break;
+    case 'textArea':
+      inputElement = <IonTextarea />;
       break;
     default:
       inputElement = (

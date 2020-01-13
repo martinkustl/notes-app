@@ -62,14 +62,15 @@ const App = ({ auth }) => {
       <IonTabButton tab="search" href="/search">
         <IonIcon icon={search} />
       </IonTabButton>
-      <IonTabButton tab="add">
-        <StyledAddTabButton onClick={() => onShowNewNoteModalChange(true)}>
+      <IonTabButton tab="add" href="/newnote">
+        {/* <StyledAddTabButton onClick={() => onShowNewNoteModalChange(true)}>
           <IonIcon icon={addCircleOutline} />
         </StyledAddTabButton>
         <NewNoteModal
           showNewNoteModal={showNewNoteModal}
           onShowNewNoteModalChange={setShowNewNoteModal}
-        />
+        /> */}
+        <IonIcon icon={addCircleOutline} />
       </IonTabButton>
       <IonTabButton tab="shared" href="/shared">
         <IonIcon icon={people} />
@@ -77,18 +78,18 @@ const App = ({ auth }) => {
     </IonTabBar>
   );
 
-  const hideMainTabs = hide => {
+  /* const hideMainTabs = hide => {
     if (hide) {
       tabButtons = <IonTabBar></IonTabBar>;
     }
-  };
+  }; */
 
   const onShowNewNoteModalChange = state => {
     setShowNewNoteModal(state);
   };
 
   const onIsNoteOpenChange = state => {
-    hideMainTabs(state);
+    // hideMainTabs(state);
     setIsNoteOpen(state);
   };
 
@@ -110,12 +111,28 @@ const App = ({ auth }) => {
         <HomeMenu contentId="main" />
         <IonTabs>
           <IonRouterOutlet id="main">
-            {/* <Route path="/home" exact={true} component={Home} /> */}
+            <Route path="/home" exact={true} component={Home} />
             <Route
               path="/note/:id"
               exact={true}
               render={props => (
-                <Note {...props} onIsNoteOpenChange={onIsNoteOpenChange} />
+                <Note
+                  {...props}
+                  onIsNoteOpenChange={onIsNoteOpenChange}
+                  isNewNote={false}
+                />
+              )}
+            />
+            <Route
+              path="/newnote"
+              /* component={NewNoteModal} */
+              exact={true}
+              render={props => (
+                <Note
+                  {...props}
+                  isNewNote={true}
+                  onIsNoteOpenChange={onIsNoteOpenChange}
+                />
               )}
             />
             <Route path="/search" component={Search} exact={true} />

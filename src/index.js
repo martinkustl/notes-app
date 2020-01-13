@@ -31,7 +31,7 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-firebase.firestore();
+// firebase.firestore();
 
 const rootReducer = combineReducers({
   auth: authReducer,

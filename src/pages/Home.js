@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 import { connect } from 'react-redux';
-import * as actionCreators from '../store/actions/index';
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
 
@@ -50,7 +49,6 @@ const Home = ({ notes }) => {
   /* const onOpenNewFolderModal = state => {
     setShowNewFolderModal(state);
   }; */
-
   return (
     <IonPage>
       <IonHeader>
@@ -99,12 +97,12 @@ const Home = ({ notes }) => {
               return (
                 <IonItem
                   routerDirection="forward"
-                  routerLink="/note/:id"
+                  routerLink={`/note/${note.id}`}
                   key={index}
                   detail
                 >
                   <StyledCircle />
-                  {note.content}
+                  {note.heading}
                 </IonItem>
               );
             })}
@@ -116,11 +114,14 @@ const Home = ({ notes }) => {
 
 const mapStateToProps = state => {
   return {
-    notes: state.firestore.ordered.notes
+    notes: state.firestore.ordered.notes,
+    auth: state.firebase.auth
   };
 };
 
 export default compose(
   connect(mapStateToProps),
-  firestoreConnect(() => [{ collection: 'notes' }])
+  firestoreConnect(props => {
+    return [{ collection: 'notes', where: ['ownerId', '==', props.auth.uid] }];
+  })
 )(Home);
