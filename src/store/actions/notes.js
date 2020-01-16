@@ -67,8 +67,7 @@ export const createNote = note => {
   return (dispatch, getState, getFirebase) => {
     const firestore = getFirebase().firestore();
     const state = getState();
-    console.log(state.firebase.auth.uid);
-    console.log(state.firebase.profile.userName);
+    dispatch({ type: actionTypes.CREATE_NOTE_REQUEST });
     firestore
       .collection('notes')
       .add({
@@ -87,3 +86,42 @@ export const createNote = note => {
       });
   };
 };
+
+export const updateNote = note => {
+  return (dispatch, getState, getFirebase) => {
+    const firestore = getFirebase().firestore();
+    const state = getState();
+    firestore
+      .collection('notes')
+      .doc(note.id)
+      .update({
+        ...note,
+        ownerId: state.firebase.auth.uid,
+        ownerName: state.firebase.profile.userName,
+        content: note.content,
+        //createdAt: new Date(),
+        updatedAt: new Date(),
+        heading: note.heading
+      })
+      .then(data => {
+        // dispatch({ type: actionTypes.CREATE_NOTE_SUCCESS });
+      })
+      .catch(err => {
+        // dispatch({ type: actionTypes.CREATE_NOTE_ERROR, error: err });
+      });
+  };
+};
+/* 
+ar washingtonRef = db.collection("cities").doc("DC");
+
+// Set the "capital" field of the city 'DC'
+return washingtonRef.update({
+    capital: true
+})
+.then(function() {
+    console.log("Document successfully updated!");
+})
+.catch(function(error) {
+    // The document probably doesn't exist.
+    console.error("Error updating document: ", error);
+}); */

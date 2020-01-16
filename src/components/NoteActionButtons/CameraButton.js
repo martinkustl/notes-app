@@ -10,6 +10,11 @@ import {
   CameraResultType
 } from '@capacitor/core';
 
+import { connect } from 'react-redux';
+import * as actionCreators from '../../store/actions/index';
+
+import * as firebase from 'firebase';
+
 const StyledCustomButton = styled.button`
   height: 100%;
   background-color: var(--ion-color-primary);
@@ -27,7 +32,12 @@ const StyledCustomButton = styled.button`
   }
 `;
 
-const CameraButton = ({ /* onPhotoUrlChange */ mode }) => {
+const CameraButton = ({
+  /* onPhotoUrlChange */ mode,
+  note,
+  noteId,
+  onUpdateNote
+}) => {
   // const [photoUrl, setPhotoUrl] = useState();
   //const [cameraAccessible, setCameraAccessible] = useState(true);
   useEffect(() => {
@@ -61,10 +71,12 @@ const CameraButton = ({ /* onPhotoUrlChange */ mode }) => {
         correctOrientation: true,
         height: 320,
         width: 200,
-        resultType: CameraResultType.DataUrl
+        resultType: CameraResultType.Base64
       })
         .then(photo => {
           //onPhotoUrlChange(photo.dataUrl);
+          console.log(photo);
+          uploadPhoto(photo);
         })
         .catch(error => {
           // in case I can't take image
@@ -80,6 +92,41 @@ const CameraButton = ({ /* onPhotoUrlChange */ mode }) => {
     }*/
   };
 
+  const uploadPhoto = photo => {
+    let ref = firebase.storage().ref(`images/test.${photo.format}`);
+
+    let uploadTask = ref.putString(`${photo.base64String}`, 'base64');
+
+    uploadTask.on(
+      'state_changed',
+      snapshot => {
+        console.log(snapshot);
+      },
+      err => {
+        console.log(err);
+      },
+      () => {
+        console.log('Image uploaded');
+
+        uploadTask.snapshot.ref.getDownloadURL().then(url => {
+          let images;
+          if (note.images) {
+            images = `${note.images},${url}`;
+          } else {
+            images = url;
+          }
+          const submitNote = {
+            id: noteId,
+            heading: note.heading,
+            content: note.content + `<img src="${url}" />`,
+            images
+          };
+          onUpdateNote(submitNote);
+        });
+      }
+    );
+  };
+
   return (
     <StyledCustomButton onClick={handleTakePhoto} className="ion-activatable">
       <IonIcon icon={camera} size="large" />
@@ -88,4 +135,23 @@ const CameraButton = ({ /* onPhotoUrlChange */ mode }) => {
   );
 };
 
-export default CameraButton;
+const mapDispatchToProps = dispatch => {
+  return {
+    onUpdateNote: note => dispatch(actionCreators.updateNote(note))
+  };
+};
+
+/* export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  firestoreConnect(props => {
+    if (props.match.params.id) {
+      return [
+        { collection: 'notes', doc: props.match.params.id, storeAs: 'note' }
+      ];
+    } else {
+      return [];
+    }
+  })
+)(Note); */
+
+export default connect(null, mapDispatchToProps)(CameraButton);

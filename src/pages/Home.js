@@ -122,6 +122,12 @@ const mapStateToProps = state => {
 export default compose(
   connect(mapStateToProps),
   firestoreConnect(props => {
-    return [{ collection: 'notes', where: ['ownerId', '==', props.auth.uid] }];
+    return [
+      {
+        collection: 'notes',
+        where: ['ownerId', '==', props.auth.uid],
+        orderBy: ['updatedAt', 'desc']
+      }
+    ];
   })
 )(Home);

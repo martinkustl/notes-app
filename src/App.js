@@ -13,8 +13,6 @@ import {
 } from '@ionic/react';
 import { addCircleOutline, search, people, home } from 'ionicons/icons';
 
-import styled from 'styled-components';
-
 import { IonReactRouter } from '@ionic/react-router';
 import HomeMenu from './components/HomeMenu/HomeMenu';
 import Home from './pages/Home';
@@ -42,41 +40,17 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-import NewNoteModal from './components/NewNoteModal/NewNoteModal';
+/* import NewNoteModal from './components/NewNoteModal/NewNoteModal';
 
 const StyledAddTabButton = styled(IonTabButton)`
   --color: var(--ion-color-success);
-`;
+`; */
 
 const App = ({ auth }) => {
-  const [showNewNoteModal, setShowNewNoteModal] = useState(false);
+  // const [showNewNoteModal, setShowNewNoteModal] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
 
-  let tabButtons;
-
-  tabButtons = (
-    <IonTabBar slot="bottom">
-      <IonTabButton tab="home" href="/home" color="secondary">
-        <IonIcon icon={home} />
-      </IonTabButton>
-      <IonTabButton tab="search" href="/search">
-        <IonIcon icon={search} />
-      </IonTabButton>
-      <IonTabButton tab="add" href="/newnote">
-        {/* <StyledAddTabButton onClick={() => onShowNewNoteModalChange(true)}>
-          <IonIcon icon={addCircleOutline} />
-        </StyledAddTabButton>
-        <NewNoteModal
-          showNewNoteModal={showNewNoteModal}
-          onShowNewNoteModalChange={setShowNewNoteModal}
-        /> */}
-        <IonIcon icon={addCircleOutline} />
-      </IonTabButton>
-      <IonTabButton tab="shared" href="/shared">
-        <IonIcon icon={people} />
-      </IonTabButton>
-    </IonTabBar>
-  );
+  let tabButtons = null;
 
   /* const hideMainTabs = hide => {
     if (hide) {
@@ -84,9 +58,9 @@ const App = ({ auth }) => {
     }
   }; */
 
-  const onShowNewNoteModalChange = state => {
+  /* const onShowNewNoteModalChange = state => {
     setShowNewNoteModal(state);
-  };
+  }; */
 
   const onIsNoteOpenChange = state => {
     // hideMainTabs(state);
@@ -95,7 +69,33 @@ const App = ({ auth }) => {
 
   if (isNoteOpen) {
     tabButtons = <IonTabBar></IonTabBar>;
+  } else {
+    tabButtons = (
+      <IonTabBar slot="bottom">
+        <IonTabButton tab="home" href="/home" color="secondary">
+          <IonIcon icon={home} />
+        </IonTabButton>
+        <IonTabButton tab="search" href="/search">
+          <IonIcon icon={search} />
+        </IonTabButton>
+        <IonTabButton tab="add" href="/newnote">
+          {/* <StyledAddTabButton onClick={() => onShowNewNoteModalChange(true)}>
+            <IonIcon icon={addCircleOutline} />
+          </StyledAddTabButton>
+          <NewNoteModal
+            showNewNoteModal={showNewNoteModal}
+            onShowNewNoteModalChange={setShowNewNoteModal}
+          /> */}
+          <IonIcon icon={addCircleOutline} />
+        </IonTabButton>
+        <IonTabButton tab="shared" href="/shared">
+          <IonIcon icon={people} />
+        </IonTabButton>
+      </IonTabBar>
+    );
   }
+
+  console.log(isNoteOpen);
 
   let routes = (
     <IonRouterOutlet id="main">

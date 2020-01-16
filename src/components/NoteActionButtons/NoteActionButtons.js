@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { IonIcon, IonRippleEffect, isPlatform } from '@ionic/react';
 
-import { microphone, images } from 'ionicons/icons';
+import { images } from 'ionicons/icons';
 
 import CameraButton from './CameraButton';
 
@@ -38,12 +38,13 @@ const StyledCustomButton = styled.button`
   }
 `;
 
-const NoteActionButtons = (
-  {
-    /* onPhotoUrlChange */
-  }
-) => {
+const NoteActionButtons = ({
+  /* onPhotoUrlChange */
+  note,
+  noteId
+}) => {
   const [mode, setMode] = useState();
+  const [photoUrl, setPhotoUrl] = useState();
 
   useEffect(() => {
     if (isPlatform('android')) {
@@ -53,7 +54,11 @@ const NoteActionButtons = (
 
   return (
     <StyledNoteCustomFooter>
-      <CameraButton /* onPhotoUrlChange={onPhotoUrlChange} */ mode={mode} />
+      <CameraButton
+        /* onPhotoUrlChange={onPhotoUrlChange} */ mode={mode}
+        note={note}
+        noteId={noteId}
+      />
       <StyledCustomButton className="ion-activatable">
         <IonIcon icon={images} size="large" />
         {mode === 'android' && (
