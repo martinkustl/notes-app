@@ -19,6 +19,7 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import Shared from './pages/Shared';
 import Note from './components/Note/Note';
+import SharedNote from './components/SharedNote/SharedNote';
 import Auth from './Auth/Auth';
 
 /* Core CSS required for Ionic components to work properly */
@@ -95,8 +96,6 @@ const App = ({ auth }) => {
     );
   }
 
-  console.log(isNoteOpen);
-
   let routes = (
     <IonRouterOutlet id="main">
       {/* <Route path="/auth" component={Auth} /> */}
@@ -113,13 +112,23 @@ const App = ({ auth }) => {
           <IonRouterOutlet id="main">
             <Route path="/home" exact={true} component={Home} />
             <Route
-              path="/note/:id"
+              path="/note/usernote/:id"
               exact={true}
               render={props => (
                 <Note
                   {...props}
                   onIsNoteOpenChange={onIsNoteOpenChange}
                   isNewNote={false}
+                />
+              )}
+            />
+            <Route
+              path="/shared/sharednote/:id"
+              exact={true}
+              render={props => (
+                <SharedNote
+                  {...props}
+                  onIsNoteOpenChange={onIsNoteOpenChange}
                 />
               )}
             />

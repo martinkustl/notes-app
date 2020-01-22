@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { connect } from 'react-redux';
 import * as actionCreators from '../../store/actions/index';
 
-/* import { compose } from 'redux';
-import { firestoreConnect } from 'react-redux-firebase'; */
-
 import * as firebase from 'firebase';
 
-import NoteOverview from './NoteOverview';
-import NoteEdit from './NoteEdit';
-import NoteActionButtons from '../NoteActionButtons/NoteActionButtons';
+import { debounce, fetchNote } from '../../shared/utility';
+
+import { create } from 'ionicons/icons';
+
+import ReactQuill from 'react-quill';
+
+import NoteActionButtons from './NoteActionButtons/NoteActionButtons';
+import ActionSheet from './ActionSheet';
+import ShareModal from './ShareModal';
 
 import {
   IonPage,
@@ -23,10 +26,17 @@ import {
   IonBackButton,
   IonTitle,
   IonButton,
-  IonIcon
+  IonIcon,
+  IonContent,
+  IonInput
 } from '@ionic/react';
 
-import { checkmark } from 'ionicons/icons';
+import styled from 'styled-components';
+
+const StyledIonInput = styled(IonInput)`
+  font-size: 24px;
+  margin-bottom: 15px;
+`;
 
 const Note = ({
   onIsNoteOpenChange,
@@ -37,55 +47,45 @@ const Note = ({
   uid,
   ownerName
 }) => {
-  const [isEditable, setIsEditable] = useState(false);
   const [note, setNote] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState();
   const [noteHeading, setNoteHeading] = useState('');
   const [noteText, setNoteText] = useState('');
   const [isNew, setIsNew] = useState(isNewNote);
+  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useIonViewWillEnter(() => {
     try {
       setTimeout(() => {
         onIsNoteOpenChange(true);
-        //const toolbar = quill.getModule('toolbar');
-        //console.log(toolbar);
-        //toolbar.addHandler('image', showImageUI);
       }, 301);
     } catch (err) {
       console.error(err);
     }
+    console.log('loads note');
     if (match.params.id) {
-      firebase
-        .firestore()
-        .collection('notes')
-        .doc(match.params.id)
-        .onSnapshot(note => {
-          console.log(note);
-          setNote(note.data());
-          /* setNoteHeading(note.data().heading);
-          setNoteText(note.data().content); */
-          //setNoteText('&lt');
+      fetchNote(match.params.id).then(note => {
+        setNote(prevState => {
+          return { ...note, id: prevState.id };
         });
-    }
-    if (isNew) {
-      setIsEditable(true);
+        setNoteHeading(note.heading);
+        setNoteText(note.content);
+      });
     }
   });
-
-  const fetchNote = id => {
-    firebase
-      .firestore()
-      .collection('notes')
-      .doc(id)
-      .onSnapshot(note => {
-        setNote({ ...note.data(), id: id });
+  useEffect(() => {
+    if (note.id) {
+      fetchNote(note.id).then(note => {
+        setNote(prevState => {
+          return { ...note, id: prevState.id };
+        });
+        setNoteHeading(note.heading);
+        setNoteText(note.content);
       });
-  };
+    }
+  }, [note.id]);
 
   useIonViewWillLeave(() => {
-    // setHideActionButtons(false);
-    // onIsNoteOpenChange(false);
     try {
       setTimeout(() => {
         onIsNoteOpenChange(false);
@@ -94,131 +94,122 @@ const Note = ({
     //onIsNoteOpenChange(false);
   });
 
-  /* const onPhotoUrlChange = state => {
-    setPhotoUrl(state);
-  }; */
-
-  /*   useIonViewDidLeave(() => {
-    setNoteText();
-  }); */
-  const handleSubmitNote = () => {
-    let submitNote;
-    if (isNew) {
-      submitNote = {
-        heading: noteHeading,
-        content: noteText
-      };
-      // onCreateNote(submitNote);
-      firebase
-        .firestore()
-        .collection('notes')
-        .add({
-          ...note,
-          ownerId: uid,
-          ownerName,
-          content: submitNote.content,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          heading: submitNote.heading
-        })
-        .then(docRef => {
-          // setNoteId(docRef.id);
-          fetchNote(docRef.id);
-        })
-        .catch(err => {});
-      setIsNew(false);
-    } else {
-      if (match.params.id) {
+  const handleSubmitNote = useCallback(
+    debounce((heading, content, note, uid, ownerName, isNew, params) => {
+      let submitNote;
+      if (isNew) {
+        console.log('submited');
         submitNote = {
-          id: match.params.id,
-          heading: noteHeading,
-          content: noteText
+          heading: heading,
+          content: content
         };
+        // onCreateNote(submitNote);
+        firebase
+          .firestore()
+          .collection('notes')
+          .add({
+            ...note,
+            ownerId: uid,
+            ownerName,
+            content: submitNote.content,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            heading: submitNote.heading
+          })
+          .then(docRef => {
+            fetchNote(docRef.id).then(note =>
+              setNote({ ...note, id: docRef.id })
+            );
+            setIsNew(false);
+          })
+          .catch(err => {
+            console.error(err);
+          });
       } else {
-        submitNote = {
-          id: note.id,
-          heading: noteHeading,
-          content: noteText
-        };
+        if (params) {
+          submitNote = {
+            id: params,
+            heading: heading,
+            content: content
+          };
+        } else {
+          submitNote = {
+            id: note.id,
+            heading: heading,
+            content: content
+          };
+        }
+        console.log(submitNote);
+        onUpdateNote(submitNote);
       }
-      onUpdateNote(submitNote);
+    }, 1500),
+    []
+  );
+
+  const getAllImages = str => {
+    let regex = new RegExp('<img .*?src="(.*?)"', 'gi'),
+      result,
+      res = [];
+    while ((result = regex.exec(str))) {
+      res.push(result[1]);
     }
-    //setIsEditable(false);
+    return res;
   };
 
-  const handleEditClick = () => {
-    setNoteHeading(note.heading);
-    setNoteText(note.content);
-    setIsEditable(true);
+  const deleteImageFromFirebase = imageUrl => {
+    const imageRef = firebase.storage().refFromURL(imageUrl);
+    imageRef
+      .delete()
+      .then(() => {
+        console.log('image deleted from firebase');
+      })
+      .catch(error => {
+        console.log('Problem during image delete');
+        console.error(error);
+      });
   };
 
   const handleNoteHeadingChange = e => {
     setNoteHeading(e.target.value);
+    if (e.target.value && noteText) {
+      handleSubmitNote(
+        e.target.value,
+        noteText,
+        note,
+        uid,
+        ownerName,
+        isNew,
+        match.params.id
+      );
+    }
   };
 
-  const handleNoteTextChange = value => {
-    //setNoteText(e.target.value);
-    //console.log(editor);
-    //setNoteText(editor.getContents());
-    console.log(value);
-    setNoteText(value);
+  const handleNoteTextChange = content => {
+    if (noteText !== '') {
+      const newImageArray = getAllImages(content);
+      const oldImageArray = getAllImages(noteText);
+      if (oldImageArray.length > newImageArray.length) {
+        const deletedImages = oldImageArray.filter(
+          image => !newImageArray.includes(image)
+        );
+        deletedImages.forEach(image => {
+          deleteImageFromFirebase(image);
+        });
+      }
+    }
+    setNoteText(content);
+    if (noteHeading && content) {
+      handleSubmitNote(
+        noteHeading,
+        content,
+        note,
+        uid,
+        ownerName,
+        isNew,
+        match.params.id
+      );
+    }
   };
-
-  let content = <div>error</div>;
-
-  if (note && !isNew && !loading) {
-    /* if (isEditable) {
-      content = (
-        <NoteEdit
-          handleSubmitNote={handleSubmitNote}
-          noteHeading={noteHeading}
-          noteText={noteText}
-          handleNoteTextChange={handleNoteTextChange}
-          handleNoteHeadingChange={handleNoteHeadingChange}
-          note={note}
-        />
-      );
-    } else if (!isEditable && !loading) {
-      content = <NoteOverview note={note} handleEditClick={handleEditClick} />;
-    } */
-    content = (
-      <NoteEdit
-        handleSubmitNote={handleSubmitNote}
-        noteHeading={noteHeading}
-        noteText={noteText}
-        handleNoteTextChange={handleNoteTextChange}
-        handleNoteHeadingChange={handleNoteHeadingChange}
-        note={note}
-      />
-    );
-  } else if (!note && isNew && !loading) {
-    /*  if (isEditable) {
-      content = (
-        <NoteEdit
-          handleSubmitNote={handleSubmitNote}
-          noteHeading={noteHeading}
-          noteText={noteText}
-          handleNoteTextChange={handleNoteTextChange}
-          handleNoteHeadingChange={handleNoteHeadingChange}
-          note={note}
-        />
-      );
-    } else if (!isEditable && !loading) {
-      content = <NoteOverview note={note} handleEditClick={handleEditClick} />;
-    } */
-    content = (
-      <NoteEdit
-        handleSubmitNote={handleSubmitNote}
-        noteHeading={noteHeading}
-        noteText={noteText}
-        handleNoteTextChange={handleNoteTextChange}
-        handleNoteHeadingChange={handleNoteHeadingChange}
-        note={note}
-      />
-    );
-  } else {
-    content = <div>Chyba</div>;
-  }
 
   return (
     <IonPage>
@@ -228,51 +219,60 @@ const Note = ({
             <IonBackButton defaultHref="/" color="secondary" />
           </IonButtons>
           <IonTitle>Cesta k poznámce</IonTitle>
-          {/*  {isEditable && ( */}
           <IonButtons slot="end">
-            <IonButton color="success" type="button" onClick={handleSubmitNote}>
-              <IonIcon icon={checkmark} />
+            <IonButton
+              type="button"
+              onClick={() => setShowActionSheet(true)}
+              color="secondary"
+            >
+              <IonIcon icon={create} />
             </IonButton>
           </IonButtons>
-          {/* )} */}
         </IonToolbar>
       </IonHeader>
-      {console.log(isNewNote)}
-      {content}
+      <IonContent className="ion-padding" color="primary" fullscreen={true}>
+        <form>
+          <StyledIonInput
+            type="string"
+            placeholder="Nadpis"
+            value={noteHeading}
+            name="heading"
+            onIonChange={handleNoteHeadingChange}
+            required={true}
+            className="ion-no-padding"
+          />
+          <ReactQuill value={noteText} onChange={handleNoteTextChange} />
+        </form>
+        <ActionSheet
+          showActionSheet={showActionSheet}
+          setShowActionSheet={setShowActionSheet}
+          setShowShareModal={setShowShareModal}
+        />
+        <ShareModal
+          showShareModal={showShareModal}
+          setShowShareModal={setShowShareModal}
+          noteId={{ params: match.params.id, newId: note.id }}
+          note={note}
+          setNote={setNote}
+        />
+      </IonContent>
       <IonFooter>
-        <NoteActionButtons note={note} noteId={match.params.id} />
+        <NoteActionButtons
+          note={note}
+          noteId={{ params: match.params.id, newId: note.id }}
+          noteText={noteText}
+          handleNoteTextChange={handleNoteTextChange}
+        />
       </IonFooter>
     </IonPage>
   );
 };
-
-/* const mapStateToProps = state => {
-  console.log(state);
-  return {
-    note: state.firestore.ordered.note && state.firestore.ordered.note[0]
-  };
-};
-
-export default compose(
-  connect(mapStateToProps),
-  firestoreConnect(props => {
-    if (props.match.params.id) {
-      return [
-        { collection: 'notes', doc: props.match.params.id, storeAs: 'note' }
-      ];
-    } else {
-      return [];
-    }
-  })
-)(Note);
- */
 
 const mapStateToProps = state => {
   return {
     loading: state.notes.loading,
     uid: state.firebase.auth.uid,
     ownerName: state.firebase.profile.userName
-    //note: state.firestore.ordered.note && state.firestore.ordered.note[0]
   };
 };
 
@@ -282,18 +282,5 @@ const mapDispatchToProps = dispatch => {
     onUpdateNote: note => dispatch(actionCreators.updateNote(note))
   };
 };
-
-/* export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  firestoreConnect(props => {
-    if (props.match.params.id) {
-      return [
-        { collection: 'notes', doc: props.match.params.id, storeAs: 'note' }
-      ];
-    } else {
-      return [];
-    }
-  })
-)(Note); */
 
 export default connect(mapStateToProps, mapDispatchToProps)(Note);

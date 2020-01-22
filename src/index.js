@@ -15,7 +15,7 @@ import thunk from 'redux-thunk';
 
 import authReducer from './store/reducers/auth';
 import notesReducer from './store/reducers/notes';
-/* import 'react-quill/dist/quill.snow.css'; */
+import 'react-quill/dist/quill.snow.css';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 

@@ -8,9 +8,6 @@ import { images } from 'ionicons/icons';
 import CameraButton from './CameraButton';
 
 const StyledNoteCustomFooter = styled.footer`
-  /* position: absolute;
-  bottom: 0;
-  left: 0; */
   z-index: 99;
   height: 50px;
   width: 100%;
@@ -39,12 +36,12 @@ const StyledCustomButton = styled.button`
 `;
 
 const NoteActionButtons = ({
-  /* onPhotoUrlChange */
   note,
-  noteId
+  noteId,
+  noteText,
+  handleNoteTextChange
 }) => {
   const [mode, setMode] = useState();
-  const [photoUrl, setPhotoUrl] = useState();
 
   useEffect(() => {
     if (isPlatform('android')) {
@@ -55,9 +52,11 @@ const NoteActionButtons = ({
   return (
     <StyledNoteCustomFooter>
       <CameraButton
-        /* onPhotoUrlChange={onPhotoUrlChange} */ mode={mode}
+        mode={mode}
         note={note}
         noteId={noteId}
+        noteText={noteText}
+        handleNoteTextChange={handleNoteTextChange}
       />
       <StyledCustomButton className="ion-activatable">
         <IonIcon icon={images} size="large" />

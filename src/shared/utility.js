@@ -1,3 +1,5 @@
+import * as firebase from 'firebase';
+
 export const checkValidity = (value, rules) => {
   let isValid = true;
   if (!rules) {
@@ -26,4 +28,48 @@ export const checkValidity = (value, rules) => {
     isValid = pattern.test(value) && isValid;
   }
   return isValid;
+};
+
+/* export const debounce = (a, b, c) => {
+  var d, e;
+  return function() {
+    function h() {
+      d = null;
+      c || (e = a.apply(f, g));
+    }
+    var f = this,
+      g = arguments;
+    return (
+      clearTimeout(d), (d = setTimeout(h, b)), c && !d && (e = a.apply(f, g)), e
+    );
+  };
+}; */
+
+export function debounce(a, b, c) {
+  var d, e;
+  return function() {
+    function h() {
+      d = null;
+      c || (e = a.apply(f, g));
+    }
+    var f = this,
+      g = arguments;
+    return (
+      clearTimeout(d), (d = setTimeout(h, b)), c && !d && (e = a.apply(f, g)), e
+    );
+  };
+}
+
+export const fetchNote = async id => {
+  try {
+    const request = await firebase
+      .firestore()
+      .collection('notes')
+      .doc(id)
+      .get();
+    const note = await request.data();
+    return note;
+  } catch (err) {
+    console.log(err);
+  }
 };

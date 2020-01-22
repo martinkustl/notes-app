@@ -126,8 +126,6 @@ const Auth = ({ onLogin, onSignUp }) => {
     }
   });
 
-  console.log(signUpForm);
-
   const checkMatch = (value1, value2) => {
     if (value1 === value2) return true;
     else return false;

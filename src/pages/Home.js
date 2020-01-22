@@ -4,6 +4,10 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
 
+import * as actionCreators from '../store/actions/index';
+
+import { trash } from 'ionicons/icons';
+
 import {
   IonContent,
   IonHeader,
@@ -16,7 +20,10 @@ import {
   IonLabel,
   IonItem,
   IonIcon,
-  IonButton
+  IonButton,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption
 } from '@ionic/react';
 
 import { add, more } from 'ionicons/icons';
@@ -41,14 +48,14 @@ const StyledCircle = styled.div`
   margin-right: 0.4rem;
 `;
 
-const Home = ({ notes }) => {
+const Home = ({ notes, auth, onDeleteNote }) => {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   // const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
-
   /* const onOpenNewFolderModal = state => {
     setShowNewFolderModal(state);
   }; */
+
   return (
     <IonPage>
       <IonHeader>
@@ -93,17 +100,26 @@ const Home = ({ notes }) => {
         <StyledIonList color="primary">
           <IonListHeader color="primary">Nepřiřazené poznámky</IonListHeader>
           {notes &&
-            notes.map((note, index) => {
+            notes.map(note => {
               return (
-                <IonItem
-                  routerDirection="forward"
-                  routerLink={`/note/${note.id}`}
-                  key={index}
-                  detail
-                >
-                  <StyledCircle />
-                  {note.heading}
-                </IonItem>
+                <IonItemSliding key={note.id}>
+                  <IonItem
+                    routerDirection="forward"
+                    routerLink={`/note/usernote/${note.id}`}
+                    detail
+                  >
+                    <StyledCircle />
+                    {note.heading}
+                  </IonItem>
+                  <IonItemOptions>
+                    <IonItemOption
+                      color="danger"
+                      onClick={() => onDeleteNote(note.id)}
+                    >
+                      <IonIcon icon={trash} size="medium" />
+                    </IonItemOption>
+                  </IonItemOptions>
+                </IonItemSliding>
               );
             })}
         </StyledIonList>
@@ -114,19 +130,26 @@ const Home = ({ notes }) => {
 
 const mapStateToProps = state => {
   return {
-    notes: state.firestore.ordered.notes,
+    notes: state.firestore.ordered.userNotes,
     auth: state.firebase.auth
   };
 };
 
+const mapDispatchToProps = dispatch => {
+  return {
+    onDeleteNote: id => dispatch(actionCreators.deleteNote(id))
+  };
+};
+
 export default compose(
-  connect(mapStateToProps),
+  connect(mapStateToProps, mapDispatchToProps),
   firestoreConnect(props => {
     return [
       {
         collection: 'notes',
         where: ['ownerId', '==', props.auth.uid],
-        orderBy: ['updatedAt', 'desc']
+        orderBy: ['updatedAt', 'desc'],
+        storeAs: 'userNotes'
       }
     ];
   })

@@ -2,67 +2,6 @@ import * as actionTypes from './actionTypes';
 
 /* import * as firebase from 'firebase'; */
 
-/* firebase
-      .firestore()
-      .collection('notes')
-      .onSnapshot(snapshot => {
-        console.log(snapshot);
-        snapshot.forEach(doc => fetchedNotes.push(doc.data()));
-        setNotes([...fetchedNotes]);
-        fetchedNotes = [];
-      }); */
-
-/* export const fetchNotesRequest = () => {
-  return { type: actionTypes.FETCH_NOTES_REQUEST };
-};
-
-export const fetchNotesSuccess = snapshot => {
-  console.log(snapshot);
-  let notes = [];
-  snapshot.forEach(doc => notes.push(doc.data()));
-  console.log(notes);
-  return { type: actionTypes.FETCH_NOTES_SUCCESS, notes: notes };
-};
-
-export const fetchNotesError = err => {
-  return { type: actionTypes.FETCH_NOTES_ERROR, error: err };
-}; */
-
-/* export const fetchNotes = () => {
-  return dispatch => {
-    firebase
-      .firestore()
-      .collection('notes')
-      .onSnapshot(snapshot => {
-        //snapshot.forEach(doc => fetchedNotes.push(doc.data()));
-        //setNotes([...fetchedNotes]);
-        dispatch(fetchNotesSuccess(snapshot));
-      });
-  };
-}; */
-
-/* export const fetchNotes = () => {
-  return (dispatch, getState, getFirebase) => {
-    const firebase = getFirebase();
-    firebase
-      .firestore()
-      .collection('notes')
-      .onSnapshot(snapshot => {
-        //snapshot.forEach(doc => fetchedNotes.push(doc.data()));
-        //setNotes([...fetchedNotes]);
-        console.log(snapshot);
-        dispatch(fetchNotesSuccess(snapshot));
-      });
-    //const firestore = getFirestore();
-    //firestore.collection('notes').onSnapshot(snapshot => {
-      //snapshot.forEach(doc => fetchedNotes.push(doc.data()));
-      //setNotes([...fetchedNotes]);
-     // console.log(snapshot);
-     // dispatch(fetchNotesSuccess(snapshot));
-    //}); 
-  //};
-}; */
-
 export const createNote = note => {
   return (dispatch, getState, getFirebase) => {
     const firestore = getFirebase().firestore();
@@ -82,6 +21,8 @@ export const createNote = note => {
         dispatch({ type: actionTypes.CREATE_NOTE_SUCCESS });
       })
       .catch(err => {
+        console.log('error occured');
+        console.error(err);
         dispatch({ type: actionTypes.CREATE_NOTE_ERROR, error: err });
       });
   };
@@ -90,20 +31,41 @@ export const createNote = note => {
 export const updateNote = note => {
   return (dispatch, getState, getFirebase) => {
     const firestore = getFirebase().firestore();
-    const state = getState();
     firestore
       .collection('notes')
       .doc(note.id)
       .update({
         ...note,
-        ownerId: state.firebase.auth.uid,
-        ownerName: state.firebase.profile.userName,
         content: note.content,
-        //createdAt: new Date(),
         updatedAt: new Date(),
         heading: note.heading
       })
       .then(data => {
+        console.log('document updated');
+        // dispatch({ type: actionTypes.CREATE_NOTE_SUCCESS });
+      })
+      .catch(err => {
+        console.log('error occured');
+        console.error(err);
+        // dispatch({ type: actionTypes.CREATE_NOTE_ERROR, error: err });
+      });
+  };
+};
+
+export const updateNoteShare = share => {
+  return (dispatch, getState, getFirebase) => {
+    const firestore = getFirebase().firestore();
+    firestore
+      .collection('notes')
+      .doc(share.id)
+      .update({
+        updatedAt: new Date(),
+        //collaborators: share.collaborators
+        collaborators: share.collaborators
+      })
+      .then(data => {
+        console.log(data);
+        console.log('document share updated');
         // dispatch({ type: actionTypes.CREATE_NOTE_SUCCESS });
       })
       .catch(err => {
@@ -111,17 +73,23 @@ export const updateNote = note => {
       });
   };
 };
-/* 
-ar washingtonRef = db.collection("cities").doc("DC");
 
-// Set the "capital" field of the city 'DC'
-return washingtonRef.update({
-    capital: true
-})
-.then(function() {
-    console.log("Document successfully updated!");
-})
-.catch(function(error) {
-    // The document probably doesn't exist.
-    console.error("Error updating document: ", error);
-}); */
+export const deleteNote = id => {
+  return (dispatch, getState, getFirebase) => {
+    const firestore = getFirebase().firestore();
+    /* firestore
+      .delete({ collection: 'cities', doc: 'SF' })
+      .then(() => console.log('note deleted')); */
+    firestore
+      .collection('notes')
+      .doc(id)
+      .delete()
+      .then(() => {
+        console.log('note deleted');
+      })
+      .catch(err => {
+        console.log('error occured during delete');
+        console.log(err);
+      });
+  };
+};
