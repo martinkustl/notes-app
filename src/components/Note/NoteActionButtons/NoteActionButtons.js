@@ -35,12 +35,7 @@ const StyledCustomButton = styled.button`
   }
 `;
 
-const NoteActionButtons = ({
-  note,
-  noteId,
-  noteText,
-  handleNoteTextChange
-}) => {
+const NoteActionButtons = ({ cursorPosition, quillRef, setUploadingImage }) => {
   const [mode, setMode] = useState();
 
   useEffect(() => {
@@ -53,10 +48,9 @@ const NoteActionButtons = ({
     <StyledNoteCustomFooter>
       <CameraButton
         mode={mode}
-        note={note}
-        noteId={noteId}
-        noteText={noteText}
-        handleNoteTextChange={handleNoteTextChange}
+        cursorPosition={cursorPosition}
+        quillRef={quillRef}
+        setUploadingImage={setUploadingImage}
       />
       <StyledCustomButton className="ion-activatable">
         <IonIcon icon={images} size="large" />
@@ -64,12 +58,6 @@ const NoteActionButtons = ({
           <IonRippleEffect type="bounded"></IonRippleEffect>
         )}
       </StyledCustomButton>
-      {/*  <StyledCustomButton className="ion-activatable">
-        <IonIcon icon={microphone} size="large" />
-        {mode === 'android' && (
-          <IonRippleEffect type="bounded"></IonRippleEffect>
-        )}
-      </StyledCustomButton> */}
     </StyledNoteCustomFooter>
   );
 };

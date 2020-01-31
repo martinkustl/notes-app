@@ -6,8 +6,7 @@ import {
   IonTitle,
   IonContent,
   IonListHeader,
-  IonItem,
-  StyledCircle
+  IonItem
 } from '@ionic/react';
 
 import { connect } from 'react-redux';
@@ -18,12 +17,11 @@ import { StyledIonList } from '../styles';
 
 import styled from 'styled-components';
 
-const StyledCircleTwo = styled.div`
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: blue;
-  margin-right: 0.4rem;
+const StyledIonListHeader = styled(IonListHeader)`
+  font-size: 17px;
+  min-height: 0;
+  height: 30px;
+  line-height: 30px;
 `;
 
 const Shared = ({ notes }) => {
@@ -36,17 +34,17 @@ const Shared = ({ notes }) => {
       </IonHeader>
       <IonContent color="primary">
         <StyledIonList color="primary">
-          <IonListHeader color="primary">Nepřiřazené poznámky</IonListHeader>
+          <StyledIonListHeader color="primary">Poznámky</StyledIonListHeader>
           {notes &&
             notes.map((note, index) => {
               return (
                 <IonItem
                   routerDirection="forward"
-                  routerLink={`/shared/sharednote/${note.id}`}
+                  /* routerLink={`/shared/sharednote/${note.id}`} */
+                  routerLink={`/note/usernote/${note.id}`}
                   key={index}
                   detail
                 >
-                  <StyledCircleTwo />
                   {note.heading}
                 </IonItem>
               );

@@ -7,15 +7,26 @@ import {
   IonItem,
   IonButton
 } from '@ionic/react';
-import React from 'react';
+import React, { useState } from 'react';
+
+import UserProfile from './UserPofile';
+
 import { StyledIonList } from '../../styles';
 
-import { connect } from 'react-redux';
-import * as actionCreators from '../../store/actions/index';
+import { useFirebase } from 'react-redux-firebase';
 
-const HomeMenu = ({ onLogout }) => {
+const HomeMenu = () => {
+  const [openProfile, setOpenProfile] = useState(false);
+
+  const firebase = useFirebase();
+
   const logoutClick = () => {
-    onLogout();
+    firebase.logout();
+  };
+
+  const handleOpenProfile = () => {
+    console.log('clicked');
+    setOpenProfile(true);
   };
 
   return (
@@ -27,21 +38,20 @@ const HomeMenu = ({ onLogout }) => {
       </IonHeader>
       <IonContent color="primary">
         <StyledIonList className="customizedList">
-          <IonItem color="primary">Upravit barvy štítků</IonItem>
-          <IonItem color="primary">Můj profil</IonItem>
+          <IonItem color="primary" onClick={handleOpenProfile}>
+            Můj profil
+          </IonItem>
         </StyledIonList>
         <IonButton color="danger" fill="clear" onClick={logoutClick}>
           Odhlásit
         </IonButton>
+        <UserProfile
+          openProfile={openProfile}
+          setOpenProfile={setOpenProfile}
+        />
       </IonContent>
     </IonMenu>
   );
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    onLogout: () => dispatch(actionCreators.logout())
-  };
-};
-
-export default connect(null, mapDispatchToProps)(HomeMenu);
+export default HomeMenu;

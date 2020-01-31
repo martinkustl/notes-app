@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { connect } from 'react-redux';
 import * as actionCreators from '../store/actions/index';
 
 import Input from '../UI/Input';
 import { checkValidity } from '../shared/utility';
+
+import { useFirebase } from 'react-redux-firebase';
 
 import {
   IonContent,
@@ -15,7 +17,10 @@ import {
   IonItem,
   IonLabel,
   IonText,
-  IonButton
+  IonButton,
+  IonLoading,
+  IonToast,
+  useIonViewDidLeave
 } from '@ionic/react';
 
 import styled from 'styled-components';
@@ -35,9 +40,76 @@ const StyledForm = styled.form`
   margin-bottom: 24px;
 `;
 
-const Auth = ({ onLogin, onSignUp }) => {
+const StyledIonLoading = styled(IonLoading)`
+  --spinner-color: var(--ion-color-secondary);
+`;
+
+const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
   const [isValid, setIsValid] = useState(false);
   const [isSignUp, setIsSignUp] = useState(true);
+  const [error, setError] = useState({ isPresent: false, message: '' });
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  const firebase = useFirebase();
+
+  useEffect(() => {
+    if (loginError) {
+      switch (loginError.code) {
+        case 'auth/user-not-found':
+          setError(prevState => {
+            return {
+              ...prevState,
+              isPresent: true,
+              message: 'Chybné přihlašovací údaje'
+            };
+          });
+          break;
+        case 'auth/network-request-failed':
+          setError(prevState => {
+            return {
+              ...prevState,
+              isPresent: true,
+              message: 'Nemáte připojení k internetu'
+            };
+          });
+          break;
+        default:
+          setError(prevState => {
+            return { ...prevState, isPresent: true, message: 'Neznámá chyba' };
+          });
+      }
+    } else if (signUpError) {
+      switch (signUpError.code) {
+        case 'auth/email-already-in-use':
+          setError(prevState => {
+            return {
+              ...prevState,
+              isPresent: true,
+              message: 'Email je již využíván jiným účtem'
+            };
+          });
+          break;
+        case 'auth/network-request-failed':
+          setError(prevState => {
+            return {
+              ...prevState,
+              isPresent: true,
+              message: 'Nemáte připojení k internetu'
+            };
+          });
+          break;
+        default:
+          setError(prevState => {
+            return { ...prevState, isPresent: true, message: 'Neznámá chyba' };
+          });
+      }
+    }
+  }, [loginError, signUpError]);
+
+  useIonViewDidLeave(() => {
+    setLoginLoading(false);
+  });
+
   const [signUpForm, setSignUpForm] = useState({
     name: {
       elementType: 'input',
@@ -172,7 +244,15 @@ const Auth = ({ onLogin, onSignUp }) => {
 
   const submitLogin = e => {
     e.preventDefault();
-    onLogin({
+    setError(prevState => {
+      return {
+        ...prevState,
+        isPresent: false,
+        message: ''
+      };
+    });
+    setLoginLoading(true);
+    firebase.login({
       email: loginForm.email.value,
       password: loginForm.password.value
     });
@@ -183,7 +263,6 @@ const Auth = ({ onLogin, onSignUp }) => {
   };
 
   let form = null;
-
   if (isSignUp) {
     const formElementsArray = [];
     for (let key in signUpForm) {
@@ -286,15 +365,36 @@ const Auth = ({ onLogin, onSignUp }) => {
     );
   }
 
+  console.log('rerendered');
+
   return (
     <IonPage>
       <IonHeader translucent>
         <IonToolbar color="primary">
-          <IonTitle>Registrace</IonTitle>
+          <IonTitle>{isSignUp ? ' Registrace' : 'Přihlášení'}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen color="primary">
         {form}
+        <StyledIonLoading
+          isOpen={signUpLoading}
+          message="Načítnání"
+          backdropDismiss={true}
+        />
+        <IonLoading
+          isOpen={loginLoading}
+          message="Načítnání"
+          backdropDismiss={true}
+        />
+        {error.isPresent && (
+          <IonToast
+            isOpen={true}
+            message={error.message}
+            position="top"
+            duration={2000}
+          />
+        )}
+        {/*  <p>{error.message}</p> */}
         <StyledCenterItems>
           <IonButton color="secondary" fill="clear" onClick={switchForm}>
             Přepnout na
@@ -306,13 +406,20 @@ const Auth = ({ onLogin, onSignUp }) => {
   );
 };
 
+const mapStateToProps = state => {
+  console.log(state);
+  return {
+    loginError: state.firebase.authError,
+    signUpError: state.auth.error,
+    signUpLoading: state.auth.loading,
+    loginLoading: state.firebase.auth.isLoaded
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   return {
-    /* onAuth: (email, password, isSignUp) =>
-      dispatch(actionCreators.auth(email, password, isSignUp)), */
-    onLogin: creds => dispatch(actionCreators.login(creds)),
     onSignUp: newUser => dispatch(actionCreators.signUp(newUser))
   };
 };
 
-export default connect(null, mapDispatchToProps)(Auth);
+export default connect(mapStateToProps, mapDispatchToProps)(Auth);

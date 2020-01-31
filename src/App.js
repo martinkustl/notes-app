@@ -41,30 +41,28 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-/* import NewNoteModal from './components/NewNoteModal/NewNoteModal';
-
-const StyledAddTabButton = styled(IonTabButton)`
-  --color: var(--ion-color-success);
-`; */
+import { setupConfig } from '@ionic/core';
+setupConfig({
+  inputBlurring: false
+});
 
 const App = ({ auth }) => {
-  // const [showNewNoteModal, setShowNewNoteModal] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
+
+  /*   useEffect(() => {
+    var connectedRef = firebase.database().ref('.info/connected');
+    connectedRef.on('value', function(snap) {
+      if (snap.val() === true) {
+        console.log('connected');
+      } else {
+        console.log('not connected');
+      }
+    });
+  }); */
 
   let tabButtons = null;
 
-  /* const hideMainTabs = hide => {
-    if (hide) {
-      tabButtons = <IonTabBar></IonTabBar>;
-    }
-  }; */
-
-  /* const onShowNewNoteModalChange = state => {
-    setShowNewNoteModal(state);
-  }; */
-
   const onIsNoteOpenChange = state => {
-    // hideMainTabs(state);
     setIsNoteOpen(state);
   };
 
@@ -72,7 +70,7 @@ const App = ({ auth }) => {
     tabButtons = <IonTabBar></IonTabBar>;
   } else {
     tabButtons = (
-      <IonTabBar slot="bottom">
+      <IonTabBar slot="bottom" translucent={true}>
         <IonTabButton tab="home" href="/home" color="secondary">
           <IonIcon icon={home} />
         </IonTabButton>
@@ -141,6 +139,7 @@ const App = ({ auth }) => {
                   {...props}
                   isNewNote={true}
                   onIsNoteOpenChange={onIsNoteOpenChange}
+                  testauth={auth}
                 />
               )}
             />

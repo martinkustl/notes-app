@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-import { connect } from 'react-redux';
-import * as actionCreators from '../../store/actions/index';
-
 import {
   IonModal,
   IonButton,
@@ -17,7 +14,7 @@ import {
   IonIcon
 } from '@ionic/react';
 
-import { checkmark } from 'ionicons/icons';
+import { checkmark, create, close } from 'ionicons/icons';
 
 import styled from 'styled-components';
 
@@ -38,12 +35,12 @@ const StyledIonInput = styled(IonInput)`
 const ShareModal = ({
   showShareModal,
   setShowShareModal,
-  noteId,
-  onUpdateNoteShare,
+  updateNoteShare,
   note,
   setNote
 }) => {
   const [shareInput, setShareInput] = useState();
+  const [editShareList, setEditShareList] = useState(false);
 
   const handleShareInputChange = e => {
     setShareInput(e.target.value);
@@ -54,40 +51,52 @@ const ShareModal = ({
 
   const submitShareForm = e => {
     e.preventDefault();
-    if (shareInput) {
+    let isValid = true;
+    if (shareInput && note.id) {
       let share;
-      if (noteId.params) {
-        if (note.collaborators) {
-          share = {
-            id: noteId.params,
-            collaborators: [...note.collaborators, shareInput]
-          };
-        } else {
-          share = {
-            id: noteId.params,
-            collaborators: [shareInput]
-          };
-        }
-      } else if (noteId.newId) {
-        if (note.collaborators) {
-          share = {
-            id: noteId.newId,
-            collaborators: [...note.collaborators, shareInput]
-          };
-        } else {
-          share = {
-            id: noteId.newId,
-            collaborators: [shareInput]
-          };
-        }
+      if (note.collaborators) {
+        share = {
+          id: note.id,
+          collaborators: [...note.collaborators, shareInput],
+          updatedAt: new Date()
+        };
+      } else {
+        share = {
+          id: note.id,
+          collaborators: [shareInput],
+          updatedAt: new Date()
+        };
       }
-      setNote(prevState => {
-        return { ...prevState, collaborators: [...share.collaborators] };
-      });
-      onUpdateNoteShare(share);
-      setShareInput();
-      //setShowShareModal(false);
+      if (note.collaborators) {
+        note.collaborators.forEach(collab => {
+          if (collab === shareInput) {
+            isValid = false;
+          }
+        });
+      }
+      if (isValid) {
+        setNote(prevState => {
+          return { ...prevState, collaborators: [...share.collaborators] };
+        });
+        updateNoteShare(share);
+        setShareInput();
+      }
     }
+  };
+
+  const handleDeleteClick = collaborator => {
+    const updated = note.collaborators.filter(collab => {
+      return collab !== collaborator;
+    });
+    let share;
+    if (note.id) {
+      share = {
+        id: note.id,
+        collaborators: [...updated],
+        updatedAt: new Date()
+      };
+    }
+    updateNoteShare(share);
   };
 
   return (
@@ -104,15 +113,15 @@ const ShareModal = ({
             </IonButton>
           </IonButtons>
           <IonTitle>Sdílení</IonTitle>
-          {/*  <IonButtons slot="end">
+          <IonButtons slot="end">
             <IonButton
               type="button"
-              onClick={submitShareForm}
+              onClick={() => setEditShareList(prevState => !prevState)}
               color="secondary"
             >
-              Potvrdit
+              <IonIcon icon={create} />
             </IonButton>
-          </IonButtons> */}
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent color="primary">
@@ -123,13 +132,6 @@ const ShareModal = ({
       >
         Zavřít
       </IonButton> */}
-        {note.collaborators && (
-          <IonList>
-            {note.collaborators.map((collaborator, index) => (
-              <IonItem key={index}>{collaborator}</IonItem>
-            ))}
-          </IonList>
-        )}
         <StyledForm onSubmit={submitShareForm}>
           <StyledIonInput
             value={shareInput}
@@ -147,15 +149,28 @@ const ShareModal = ({
             <IonIcon icon={checkmark} size="large" />
           </IonButton>
         </StyledForm>
+        {note.collaborators && (
+          <IonList className="ion-no-padding">
+            {note.collaborators.map((collaborator, index) => (
+              <IonItem key={index}>
+                {collaborator}
+                {editShareList && (
+                  <IonButton
+                    slot="end"
+                    color="danger"
+                    fill="clear"
+                    onClick={() => handleDeleteClick(collaborator)}
+                  >
+                    <IonIcon icon={close} />
+                  </IonButton>
+                )}
+              </IonItem>
+            ))}
+          </IonList>
+        )}
       </IonContent>
     </StyledIonShareModal>
   );
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    onUpdateNoteShare: share => dispatch(actionCreators.updateNoteShare(share))
-  };
-};
-
-export default connect(null, mapDispatchToProps)(ShareModal);
+export default ShareModal;

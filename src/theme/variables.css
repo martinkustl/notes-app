@@ -68,10 +68,10 @@ http://ionicframework.com/docs/theming/ */
 }
 
 ion-list-header {
-  font-size: 17px;
+  /* font-size: 17px;
   min-height: 0;
   height: 30px;
-  line-height: 30px;
+  line-height: 30px; */
 }
 
 ion-item {
@@ -81,6 +81,10 @@ ion-item {
   --detail-icon-opacity: 1;
   --highlight-color-focused: var(--ion-color-secondary);
   --color-focused: var(--ion-color-secondary);
+}
+
+ion-loading {
+  --spinner-color: var(--ion-color-secondary) !important;
 }
 
 ion-toolbar {
