@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { IonIcon, IonRippleEffect, isPlatform } from '@ionic/react';
-
-import { images } from 'ionicons/icons';
+import { isPlatform } from '@ionic/react';
 
 import CameraButton from './CameraButton';
+import GalleryButton from './GalleryButton';
 
 const StyledNoteCustomFooter = styled.footer`
   z-index: 99;
@@ -16,26 +15,7 @@ const StyledNoteCustomFooter = styled.footer`
   border-top: 1px solid var(--ion-color-medium);
 `;
 
-const StyledCustomButton = styled.button`
-  height: 100%;
-  background-color: var(--ion-color-primary);
-  color: var(--ion-color-secondary);
-  width: 100%;
-  padding: 0;
-  opacity: 1;
-  position: relative;
-  overflow: hidden;
-  &:active {
-    outline: none;
-    opacity: 0.5;
-    transition: opacity 0.2s ease-in;
-  }
-  &:focus {
-    outline: none;
-  }
-`;
-
-const NoteActionButtons = ({ cursorPosition, quillRef, setUploadingImage }) => {
+const NoteActionButtons = ({ handleTakePhoto, handlePickGalleryPhoto }) => {
   const [mode, setMode] = useState();
 
   useEffect(() => {
@@ -46,18 +26,17 @@ const NoteActionButtons = ({ cursorPosition, quillRef, setUploadingImage }) => {
 
   return (
     <StyledNoteCustomFooter>
-      <CameraButton
-        mode={mode}
-        cursorPosition={cursorPosition}
-        quillRef={quillRef}
-        setUploadingImage={setUploadingImage}
-      />
-      <StyledCustomButton className="ion-activatable">
+      <CameraButton mode={mode} handleTakePhoto={handleTakePhoto} />
+      {/* <StyledCustomButton className="ion-activatable">
         <IonIcon icon={images} size="large" />
         {mode === 'android' && (
           <IonRippleEffect type="bounded"></IonRippleEffect>
         )}
-      </StyledCustomButton>
+      </StyledCustomButton> */}
+      <GalleryButton
+        mode={mode}
+        handlePickGalleryPhoto={handlePickGalleryPhoto}
+      />
     </StyledNoteCustomFooter>
   );
 };

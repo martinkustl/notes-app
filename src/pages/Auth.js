@@ -365,8 +365,6 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
     );
   }
 
-  console.log('rerendered');
-
   return (
     <IonPage>
       <IonHeader translucent>
@@ -407,7 +405,6 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
 };
 
 const mapStateToProps = state => {
-  console.log(state);
   return {
     loginError: state.firebase.authError,
     signUpError: state.auth.error,

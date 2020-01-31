@@ -4,19 +4,28 @@ import { connect } from 'react-redux';
 
 import * as firebase from 'firebase';
 
-import { debounce, fetchNote } from '../../shared/utility';
+import { debounce, fetchNote } from '../shared/utility';
 
 import { create } from 'ionicons/icons';
 
 import ReactQuill, { Quill } from 'react-quill';
 
-import NoteActionButtons from './NoteActionButtons/NoteActionButtons';
-import ActionSheet from './ActionSheet';
-import ShareModal from './ShareModal';
-import ImageModal from './ImageModal';
+import NoteActionButtons from '../components/Note/NoteActionButtons/NoteActionButtons';
+import ActionSheet from '../components/Note/ActionSheet';
+import ShareModal from '../components/Note/ShareModal';
+import ImageModal from '../components/Note/ImageModal';
 
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
+
+import {
+  Plugins,
+  Capacitor,
+  CameraSource,
+  CameraResultType
+} from '@capacitor/core';
+
+import uuid from 'uuid/v4';
 
 import {
   IonPage,
@@ -95,7 +104,8 @@ const Note = ({
   const [imageUrl, setImageUrl] = useState();
   const [uploadingImage, setUploadingImage] = useState({
     isOpen: false,
-    percentage: null
+    percentage: null,
+    ref: null
   });
 
   useIonViewWillEnter(() => {
@@ -162,10 +172,6 @@ const Note = ({
       setNoteHeading(note.heading);
       setNoteText(note.content);
     }
-    /* if (note) {
-      setNoteHeading(note.heading);
-      setNoteText(note.content);
-    } */
   }, [note]);
 
   useEffect(() => {
@@ -324,6 +330,98 @@ const Note = ({
     }
   };
 
+  const handleTakePhoto = () => {
+    if (!Capacitor.isPluginAvailable('Camera')) {
+      return console.error('Camera not available');
+    } else {
+      Plugins.Camera.getPhoto({
+        quality: 90,
+        source: CameraSource.Camera,
+        correctOrientation: true,
+        height: 320,
+        width: 200,
+        resultType: CameraResultType.Base64
+      })
+        .then(photo => {
+          uploadPhoto(photo);
+        })
+        .catch(error => {
+          console.error(error);
+          return false;
+        });
+    }
+  };
+
+  const handlePickGalleryPhoto = () => {
+    if (!Capacitor.isPluginAvailable('Camera')) {
+      return console.log('Camera not available');
+    } else {
+      Plugins.Camera.getPhoto({
+        quality: 90,
+        source: CameraSource.Photos,
+        correctOrientation: true,
+        height: 320,
+        width: 200,
+        resultType: CameraResultType.Base64
+      })
+        .then(photo => {
+          uploadPhoto(photo);
+        })
+        .catch(error => {
+          console.log(error);
+          return false;
+        });
+    }
+  };
+
+  const uploadPhoto = photo => {
+    const ref = firebase.storage().ref(`images/${uuid()}.${photo.format}`);
+    const uploadTask = ref.putString(`${photo.base64String}`, 'base64');
+    uploadTask.on(
+      'state_changed',
+      snapshot => {
+        let percentage =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadingImage({
+          isOpen: true,
+          percentage: percentage,
+          ref: uploadTask
+        });
+      },
+      err => {
+        console.log(err);
+      },
+      () => {
+        console.log('Image uploaded');
+        uploadTask.snapshot.ref.getDownloadURL().then(url => {
+          insertPhotoToNote(url);
+          setUploadingImage({ isOpen: false, percentage: null, ref: null });
+        });
+      }
+    );
+  };
+
+  const insertPhotoToNote = url => {
+    if (cursorPosition || cursorPosition === 0) {
+      quillRef.current.getEditor().insertEmbed(cursorPosition, 'image', url);
+    } else {
+      quillRef.current
+        .getEditor()
+        .insertEmbed(quillRef.current.getEditor().getLength(), 'image', url);
+    }
+  };
+
+  const handleImageUploadCancel = () => {
+    if (uploadingImage.ref) {
+      uploadingImage.ref.cancel();
+    }
+    setUploadingImage({
+      isOpen: false,
+      percentage: null,
+      ref: null
+    });
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -401,9 +499,7 @@ const Note = ({
             <IonButton
               color="danger"
               fill="clear"
-              onClick={() =>
-                setUploadingImage({ isOpen: false, percentage: null })
-              }
+              onClick={() => handleImageUploadCancel()}
             >
               Zrušit nahrávání
             </IonButton>
@@ -412,9 +508,8 @@ const Note = ({
       </IonContent>
       <IonFooter>
         <NoteActionButtons
-          cursorPosition={cursorPosition}
-          quillRef={quillRef}
-          setUploadingImage={setUploadingImage}
+          handleTakePhoto={handleTakePhoto}
+          handlePickGalleryPhoto={handlePickGalleryPhoto}
         />
       </IonFooter>
     </IonPage>

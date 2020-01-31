@@ -30,15 +30,6 @@ import { StyledIonList } from '../styles';
 
 import styled from 'styled-components';
 
-/* import NewFolderModal from '../components/NewFolderModal/NewFolderModal';
- */
-/* const StyledOptionsButton = styled(IonButton)`
-  --color: var(--ion-color-dark);
-  --color-activated: var(--ion-color-secondary);
-  --background-focused: var(--ion-color-secondary);
-`;
- */
-
 const StyledIonListHeader = styled(IonListHeader)`
   font-size: 17px;
   min-height: 0;
@@ -47,12 +38,6 @@ const StyledIonListHeader = styled(IonListHeader)`
 `;
 
 const Home = ({ notes, firestore }) => {
-  /*  const [showNewFolderModal, setShowNewFolderModal] = useState(false);
-  // const [notes, setNotes] = useState([]); */
-  /* const onOpenNewFolderModal = state => {
-    setShowNewFolderModal(state);
-  }; */
-
   return (
     <IonPage>
       <IonHeader>
@@ -64,36 +49,6 @@ const Home = ({ notes, firestore }) => {
         </IonToolbar>
       </IonHeader>
       <IonContent color="primary">
-        {/* <StyledIonList color="primary">
-          <IonListHeader color="primary">
-            Složky
-            <IonButton
-              color="success"
-              fill="clear"
-              onClick={() => {
-                setShowNewFolderModal(true);
-              }}
-            >
-              <IonIcon icon={add} />
-            </IonButton>
-          </IonListHeader>
-          <NewFolderModal
-            showNewFolderModal={showNewFolderModal}
-            onShowNewFolderModalChange={setShowNewFolderModal}
-          />
-          {folders &&
-            folders.map((folder, index) => {
-              return (
-                <IonItem key={index}>
-                  <StyledCircle />
-                  <IonLabel>{folder.name}</IonLabel>
-                  <StyledOptionsButton fill="clear">
-                    <IonIcon icon={more} />
-                  </StyledOptionsButton>
-                </IonItem>
-              );
-            })}
-        </StyledIonList> */}
         <StyledIonList color="primary">
           <StyledIonListHeader color="primary">Poznámky</StyledIonListHeader>
           {notes &&
@@ -135,14 +90,6 @@ const mapStateToProps = state => {
     auth: state.firebase.auth
   };
 };
-/* 
-const mapDispatchToProps = dispatch => {
-  return {
-    onDeleteNote: id => dispatch(actionCreators.deleteNote(id))
-    //onDeleteNote: id => dispatch()
-  };
-};
- */
 export default compose(
   connect(mapStateToProps, null),
   firestoreConnect(props => {

@@ -18,9 +18,8 @@ import HomeMenu from './components/HomeMenu/HomeMenu';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Shared from './pages/Shared';
-import Note from './components/Note/Note';
-import SharedNote from './components/SharedNote/SharedNote';
-import Auth from './Auth/Auth';
+import Note from './pages/Note';
+import Auth from './pages/Auth';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -124,10 +123,7 @@ const App = ({ auth }) => {
               path="/shared/sharednote/:id"
               exact={true}
               render={props => (
-                <SharedNote
-                  {...props}
-                  onIsNoteOpenChange={onIsNoteOpenChange}
-                />
+                <Note {...props} onIsNoteOpenChange={onIsNoteOpenChange} />
               )}
             />
             <Route

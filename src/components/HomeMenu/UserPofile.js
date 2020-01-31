@@ -19,7 +19,11 @@ import { create } from 'ionicons/icons';
 
 const UserPofile = ({ userName, userEmail, openProfile, setOpenProfile }) => {
   return (
-    <IonModal isOpen={openProfile}>
+    <IonModal
+      isOpen={openProfile}
+      animated={false}
+      onDidDismiss={() => setOpenProfile(false)}
+    >
       <IonHeader>
         <IonToolbar color="primary">
           <IonButtons slot="start">

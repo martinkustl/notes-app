@@ -2,7 +2,7 @@ import React from 'react';
 
 import { IonActionSheet } from '@ionic/react';
 
-import classes from './Note.module.css';
+import classes from './ActionSheet.module.css';
 
 import styled from 'styled-components';
 
