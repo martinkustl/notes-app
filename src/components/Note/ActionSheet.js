@@ -19,7 +19,8 @@ const StyledIonActionSheet = styled(IonActionSheet)`
 const ActionSheet = ({
   showActionSheet,
   setShowActionSheet,
-  setShowShareModal
+  setShowShareModal,
+  handleDeleteNote
 }) => {
   return (
     <StyledIonActionSheet
@@ -33,6 +34,7 @@ const ActionSheet = ({
           cssClass: classes.deleteButton,
           handler: () => {
             console.log('Delete clicked');
+            handleDeleteNote();
           }
         },
         {

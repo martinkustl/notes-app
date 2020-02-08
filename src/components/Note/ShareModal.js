@@ -99,6 +99,32 @@ const ShareModal = ({
     updateNoteShare(share);
   };
 
+  let collabList = null;
+
+  if (note && note.collaborators) {
+    collabList = (
+      <IonList className="ion-no-padding">
+        {note.collaborators.map((collaborator, index) => (
+          <IonItem key={index}>
+            {collaborator}
+            {editShareList && (
+              <IonButton
+                slot="end"
+                color="danger"
+                fill="clear"
+                onClick={() => handleDeleteClick(collaborator)}
+              >
+                <IonIcon icon={close} />
+              </IonButton>
+            )}
+          </IonItem>
+        ))}
+      </IonList>
+    );
+  }
+
+  console.log(note);
+
   return (
     <StyledIonShareModal isOpen={showShareModal}>
       <IonHeader>
@@ -149,25 +175,7 @@ const ShareModal = ({
             <IonIcon icon={checkmark} size="large" />
           </IonButton>
         </StyledForm>
-        {note.collaborators && (
-          <IonList className="ion-no-padding">
-            {note.collaborators.map((collaborator, index) => (
-              <IonItem key={index}>
-                {collaborator}
-                {editShareList && (
-                  <IonButton
-                    slot="end"
-                    color="danger"
-                    fill="clear"
-                    onClick={() => handleDeleteClick(collaborator)}
-                  >
-                    <IonIcon icon={close} />
-                  </IonButton>
-                )}
-              </IonItem>
-            ))}
-          </IonList>
-        )}
+        {collabList}
       </IonContent>
     </StyledIonShareModal>
   );

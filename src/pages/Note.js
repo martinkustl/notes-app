@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import * as firebase from 'firebase';
 
-import { debounce, fetchNote } from '../shared/utility';
+import { debounce } from '../shared/utility';
 
 import ReactQuill, { Quill } from 'react-quill';
 
@@ -44,8 +44,7 @@ import {
   IonList,
   IonListHeader,
   IonLabel,
-  IonMenuToggle,
-  IonMenu
+  IonMenuToggle
 } from '@ionic/react';
 
 import { create, informationCircleOutline } from 'ionicons/icons';
@@ -90,6 +89,7 @@ Quill.register(imageOnClick);
 const Note = ({
   onIsNoteOpenChange,
   match,
+  history,
   isNewNote,
   uid,
   ownerName,
@@ -134,7 +134,9 @@ const Note = ({
         .collection('notes')
         .doc(match.params.id)
         .onSnapshot(doc => {
-          setNote({ ...doc.data(), id: match.params.id });
+          if (doc.data()) {
+            setNote({ ...doc.data(), id: match.params.id });
+          }
         });
     } else if (isNew.id) {
       firebase
@@ -142,19 +144,14 @@ const Note = ({
         .collection('notes')
         .doc(isNew.id)
         .onSnapshot(doc => {
-          setNote({ ...doc.data(), id: isNew.id });
+          if (doc.data()) {
+            setNote({ ...doc.data(), id: isNew.id });
+          }
         });
     }
   }, [match.params.id, isNew, firestore]);
 
-  /* useEffect(() => {
-    if (location.state.userNote) {
-      setNote({ ...location.state.userNote });
-    }
-  }, [location.state.userNote, firestore]); */
-
   useEffect(() => {
-    // console.log(quillRef.current.getEditor());
     if (quillRef.current && note) {
       const quillHTML = quillRef.current.getEditor().root.innerHTML;
       console.log(quillHTML);
@@ -187,6 +184,7 @@ const Note = ({
   });
 
   useIonViewWillLeave(() => {
+    setNote(false);
     try {
       setTimeout(() => {
         onIsNoteOpenChange(false);
@@ -350,7 +348,7 @@ const Note = ({
         })
         .catch(error => {
           console.error(error);
-          return false;
+          console.log('photo not taken');
         });
     }
   };
@@ -372,7 +370,7 @@ const Note = ({
         })
         .catch(error => {
           console.log(error);
-          return false;
+          console.log('photo not taken');
         });
     }
   };
@@ -425,6 +423,18 @@ const Note = ({
     });
   };
 
+  const handleDeleteNote = () => {
+    firestore
+      .delete({
+        collection: 'notes',
+        doc: note.id
+      })
+      .then(res => {
+        console.log(res);
+        setNote();
+        history.goBack();
+      });
+  };
   return (
     <IonPage>
       {note && <InfoTab note={note} />}
@@ -476,6 +486,7 @@ const Note = ({
           showActionSheet={showActionSheet}
           setShowActionSheet={setShowActionSheet}
           setShowShareModal={setShowShareModal}
+          handleDeleteNote={handleDeleteNote}
         />
         <ShareModal
           showShareModal={showShareModal}

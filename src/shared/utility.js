@@ -73,11 +73,3 @@ export const fetchNote = async id => {
     console.log(err);
   }
 };
-
-/* firebase
-        .firestore()
-        .collection('notes')
-        .doc(isNew.id)
-        .onSnapshot(doc => {
-          setNote(doc.data());
-        }); */

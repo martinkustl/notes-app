@@ -63,6 +63,17 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
               message: 'Chybné přihlašovací údaje'
             };
           });
+          setLoginLoading(false);
+          break;
+        case 'auth/wrong-password':
+          setError(prevState => {
+            return {
+              ...prevState,
+              isPresent: true,
+              message: 'Chybné přihlašovací údaje'
+            };
+          });
+          setLoginLoading(false);
           break;
         case 'auth/network-request-failed':
           setError(prevState => {
@@ -72,11 +83,13 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
               message: 'Nemáte připojení k internetu'
             };
           });
+          setLoginLoading(false);
           break;
         default:
           setError(prevState => {
             return { ...prevState, isPresent: true, message: 'Neznámá chyba' };
           });
+          setLoginLoading(false);
       }
     } else if (signUpError) {
       switch (signUpError.code) {

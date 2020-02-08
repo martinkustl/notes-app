@@ -1,5 +1,7 @@
 import React from 'react';
 
+import styled from 'styled-components';
+
 import {
   IonMenu,
   IonHeader,
@@ -12,45 +14,68 @@ import {
   IonListHeader
 } from '@ionic/react';
 
+const StyledIonListHeader = styled(IonListHeader)`
+  font-size: 16px;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  font-weight: bold;
+`;
+
+const StyledDateLabel = styled.span`
+  font-size: 13px;
+  color: #3b3b3b;
+`;
+
 const InfoTab = ({ note }) => {
-  /* function toDateTime(secs) {
-    var t = new Date(1970, 0, 1); // Epoch
-    t.setSeconds(secs);
-    return t;
-}
- */
+  let collabList = null;
+
   const convertToDateTime = seconds => {
     var t = new Date(1970, 0, 1); // Epoch
     t.setSeconds(seconds);
-    return t.toString();
+    return `${t.getDay()}.${t.getDate()}.${t.getFullYear()} v ${t.getHours()}:${t.getMinutes()} `;
   };
+
+  if (note.collaborators) {
+    collabList = (
+      <IonList color="primary" className="ion-no-padding ion-margin-top">
+        <StyledIonListHeader color="primary">Sdíleno s</StyledIonListHeader>
+        {note.collaborators.map((collaborator, index) => (
+          <IonItem key={index}>{collaborator}</IonItem>
+        ))}
+      </IonList>
+    );
+  }
 
   return (
     <IonMenu
-      /* menuId="infoTab" */
-      /* isOpen={() => showInfoTab()} */
       contentId="infoTabContent"
       menuId="infoTabMenu"
       side="end"
       color="primary"
     >
-      <IonHeader>
-        <IonToolbar>
+      <IonHeader color="primary">
+        <IonToolbar color="primary">
           <IonTitle>Informace o poznámce</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent id="infoTabContent">
-        <IonList>
+      <IonContent id="infoTabContent" color="primary">
+        <IonList className="ion-no-padding">
           <IonItem>
-            <IonLabel>{convertToDateTime(note.createdAt.seconds)}</IonLabel>
+            <IonLabel>
+              {convertToDateTime(note.createdAt.seconds)}
+              <br />
+              <StyledDateLabel>Datum vytvoření</StyledDateLabel>
+            </IonLabel>
+          </IonItem>
+          <IonItem>
+            <IonLabel>
+              {convertToDateTime(note.updatedAt.seconds)}
+              <br />
+              <StyledDateLabel>Datum poslední úpravy</StyledDateLabel>
+            </IonLabel>
           </IonItem>
         </IonList>
-        <IonList>
-          <IonListHeader>Sdíleno s</IonListHeader>
-          {note.collaborators.map((collaborator, index) => (
-            <IonItem key={index}>{collaborator}</IonItem>
-          ))}
-        </IonList>
+        {collabList}
       </IonContent>
     </IonMenu>
   );
