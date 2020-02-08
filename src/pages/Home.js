@@ -43,7 +43,13 @@ const Home = ({ notes, firestore }) => {
       <IonHeader>
         <IonToolbar color="primary">
           <IonButtons slot="start">
-            <IonMenuButton color="secondary" />
+            <IonMenuButton
+              color="secondary" /* autoHide={false} */
+              /* menu="infoTabMenu" */
+              /* menu="Main" */
+              menu="mainMenu"
+              /* autoHide={false} */
+            ></IonMenuButton>
           </IonButtons>
           <IonTitle>Notes App</IonTitle>
         </IonToolbar>

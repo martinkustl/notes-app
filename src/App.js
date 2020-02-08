@@ -104,7 +104,7 @@ const App = ({ auth }) => {
   if (auth.uid) {
     routes = (
       <Fragment>
-        <HomeMenu contentId="main" />
+        <HomeMenu />
         <IonTabs>
           <IonRouterOutlet id="main">
             <Route path="/home" exact={true} component={Home} />
@@ -156,6 +156,7 @@ const App = ({ auth }) => {
 
   return (
     <IonApp>
+      {/* <HomeMenu /> */}
       <IonReactRouter>{routes}</IonReactRouter>
     </IonApp>
   );

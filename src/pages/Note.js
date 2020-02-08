@@ -6,14 +6,13 @@ import * as firebase from 'firebase';
 
 import { debounce, fetchNote } from '../shared/utility';
 
-import { create } from 'ionicons/icons';
-
 import ReactQuill, { Quill } from 'react-quill';
 
 import NoteActionButtons from '../components/Note/NoteActionButtons/NoteActionButtons';
 import ActionSheet from '../components/Note/ActionSheet';
 import ShareModal from '../components/Note/ShareModal';
 import ImageModal from '../components/Note/ImageModal';
+import InfoTab from '../components/Note/InfoTab';
 
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
@@ -44,8 +43,12 @@ import {
   IonModal,
   IonList,
   IonListHeader,
-  IonLabel
+  IonLabel,
+  IonMenuToggle,
+  IonMenu
 } from '@ionic/react';
+
+import { create, informationCircleOutline } from 'ionicons/icons';
 
 import styled from 'styled-components';
 
@@ -424,6 +427,7 @@ const Note = ({
 
   return (
     <IonPage>
+      {note && <InfoTab note={note} />}
       <IonHeader>
         <IonToolbar color="primary">
           <IonButtons slot="start">
@@ -431,6 +435,11 @@ const Note = ({
           </IonButtons>
           {/* <IonTitle>Cesta k poznámce</IonTitle> */}
           <IonButtons slot="end">
+            <IonMenuToggle menu="infoTabMenu">
+              <IonButton type="button" color="secondary">
+                <IonIcon icon={informationCircleOutline} />
+              </IonButton>
+            </IonMenuToggle>
             <IonButton
               type="button"
               onClick={() => setShowActionSheet(true)}
@@ -462,6 +471,7 @@ const Note = ({
             />
           )}
         </form>
+        {/* <InfoTab showInfoTab={showInfoTab} setShowInfoTab={setShowInfoTab} /> */}
         <ActionSheet
           showActionSheet={showActionSheet}
           setShowActionSheet={setShowActionSheet}
@@ -500,6 +510,7 @@ const Note = ({
               color="danger"
               fill="clear"
               onClick={() => handleImageUploadCancel()}
+              contentId="infoTab"
             >
               Zrušit nahrávání
             </IonButton>
