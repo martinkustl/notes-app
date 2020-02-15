@@ -77,13 +77,6 @@ const App = ({ auth }) => {
           <IonIcon icon={search} />
         </IonTabButton>
         <IonTabButton tab="add" href="/newnote">
-          {/* <StyledAddTabButton onClick={() => onShowNewNoteModalChange(true)}>
-            <IonIcon icon={addCircleOutline} />
-          </StyledAddTabButton>
-          <NewNoteModal
-            showNewNoteModal={showNewNoteModal}
-            onShowNewNoteModalChange={setShowNewNoteModal}
-          /> */}
           <IonIcon icon={addCircleOutline} />
         </IonTabButton>
         <IonTabButton tab="shared" href="/shared">

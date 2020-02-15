@@ -154,8 +154,6 @@ const Note = ({
   useEffect(() => {
     if (quillRef.current && note) {
       const quillHTML = quillRef.current.getEditor().root.innerHTML;
-      console.log(quillHTML);
-      console.log(note.content);
       if (quillHTML === note.content) {
         console.log('Database and user content are equal');
       } else {
@@ -166,6 +164,7 @@ const Note = ({
         quillRef.current
           .getEditor()
           .clipboard.dangerouslyPasteHTML(note.content);
+        quillRef.current.blur();
       }
     }
     if (note && quillRef.current === null) {
@@ -197,7 +196,6 @@ const Note = ({
     debounce((heading, content, note, uid, ownerName, isNew, params) => {
       let submitNote;
       if (isNew.boolean) {
-        console.log('submited');
         submitNote = {
           heading: heading,
           content: content
@@ -226,15 +224,15 @@ const Note = ({
           submitNote = {
             id: params,
             heading: heading,
-            content: content
-            /*  updatedAt: new Date() */
+            content: content,
+            updatedAt: new Date()
           };
         } else if (note.id) {
           submitNote = {
             id: note.id,
             heading: heading,
-            content: content
-            /*   updatedAt: new Date() */
+            content: content,
+            updatedAt: new Date()
           };
         } else {
           console.error('Error note id unassigned');

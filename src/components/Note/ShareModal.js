@@ -123,8 +123,6 @@ const ShareModal = ({
     );
   }
 
-  console.log(note);
-
   return (
     <StyledIonShareModal isOpen={showShareModal}>
       <IonHeader>

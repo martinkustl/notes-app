@@ -30,9 +30,11 @@ const InfoTab = ({ note }) => {
   let collabList = null;
 
   const convertToDateTime = seconds => {
-    var t = new Date(1970, 0, 1); // Epoch
-    t.setSeconds(seconds);
-    return `${t.getDay()}.${t.getDate()}.${t.getFullYear()} v ${t.getHours()}:${t.getMinutes()} `;
+    //var t = new Date(1970, 0, 1); // Epoch
+    const t = new Date(seconds * 1000);
+    // t.setSeconds(seconds * 1000);
+    return `${t.getDate()}.${t.getMonth() +
+      1}.${t.getFullYear()} v ${t.getHours()}:${t.getMinutes()} `;
   };
 
   if (note.collaborators) {
@@ -52,10 +54,11 @@ const InfoTab = ({ note }) => {
       menuId="infoTabMenu"
       side="end"
       color="primary"
+      type="overlay"
     >
       <IonHeader color="primary">
         <IonToolbar color="primary">
-          <IonTitle>Informace o poznámce</IonTitle>
+          <IonTitle className="ion-no-padding">Informace o poznámce</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent id="infoTabContent" color="primary">
