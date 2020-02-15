@@ -29,7 +29,7 @@ const Shared = ({ notes }) => {
     <IonPage>
       <IonHeader>
         <IonToolbar color="primary">
-          <IonTitle>Shared</IonTitle>
+          <IonTitle>Sdílené poznámky</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent color="primary">

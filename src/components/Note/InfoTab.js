@@ -26,6 +26,12 @@ const StyledDateLabel = styled.span`
   color: #3b3b3b;
 `;
 
+const StyledIonTitle = styled(IonTitle)`
+  &.ios {
+    padding: 0;
+  }
+`;
+
 const InfoTab = ({ note }) => {
   let collabList = null;
 
@@ -58,7 +64,7 @@ const InfoTab = ({ note }) => {
     >
       <IonHeader color="primary">
         <IonToolbar color="primary">
-          <IonTitle className="ion-no-padding">Informace o poznámce</IonTitle>
+          <StyledIonTitle>Informace o poznámce</StyledIonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent id="infoTabContent" color="primary">

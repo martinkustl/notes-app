@@ -1,4 +1,4 @@
-import * as firebase from 'firebase';
+// import * as firebase from 'firebase/app';
 
 export const checkValidity = (value, rules) => {
   let isValid = true;
@@ -60,7 +60,7 @@ export function debounce(a, b, c) {
   };
 }
 
-export const fetchNote = async id => {
+/* export const fetchNote = async id => {
   try {
     const request = await firebase
       .firestore()
@@ -72,4 +72,4 @@ export const fetchNote = async id => {
   } catch (err) {
     console.log(err);
   }
-};
+}; */

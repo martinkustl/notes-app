@@ -3,7 +3,11 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
+/* import 'firebase/storage'; */
+
 import {
   ReactReduxFirebaseProvider,
   getFirebase,

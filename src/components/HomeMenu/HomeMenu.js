@@ -31,7 +31,6 @@ const HomeMenu = () => {
   };
 
   const handleOpenProfile = () => {
-    console.log('clicked');
     setOpenProfile(true);
   };
 

@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
 
+import { isPlatform } from '@ionic/react';
+
 /* import * as actionCreators from '../store/actions/index';
  */
 import { trash } from 'ionicons/icons';
@@ -21,7 +23,8 @@ import {
   IonIcon,
   IonItemSliding,
   IonItemOptions,
-  IonItemOption
+  IonItemOption,
+  IonLoading
 } from '@ionic/react';
 
 /* import { add, more } from 'ionicons/icons'; */
@@ -38,6 +41,75 @@ const StyledIonListHeader = styled(IonListHeader)`
 `;
 
 const Home = ({ notes, firestore }) => {
+  let notesList = (
+    <IonLoading isOpen={!notes} message="Načítnání" backdropDismiss={true} />
+  );
+  if (notes && isPlatform('ios')) {
+    notesList = (
+      <StyledIonList color="primary">
+        <StyledIonListHeader color="primary">Poznámky</StyledIonListHeader>
+        {notes.map(note => {
+          return (
+            <IonItemSliding key={note.id}>
+              <IonItem
+                routerDirection="none"
+                routerLink={`/note/usernote/${note.id}`}
+                detail
+              >
+                {note.heading}
+              </IonItem>
+              <IonItemOptions>
+                <IonItemOption
+                  color="danger"
+                  onClick={() =>
+                    firestore.delete({
+                      collection: 'notes',
+                      doc: note.id
+                    })
+                  }
+                >
+                  <IonIcon icon={trash} size="medium" />
+                </IonItemOption>
+              </IonItemOptions>
+            </IonItemSliding>
+          );
+        })}
+      </StyledIonList>
+    );
+  } else if (notes) {
+    notesList = (
+      <StyledIonList color="primary">
+        <StyledIonListHeader color="primary">Poznámky</StyledIonListHeader>
+        {notes.map(note => {
+          return (
+            <IonItemSliding key={note.id}>
+              <IonItem
+                routerDirection="forward"
+                routerLink={`/note/usernote/${note.id}`}
+                detail
+              >
+                {note.heading}
+              </IonItem>
+              <IonItemOptions>
+                <IonItemOption
+                  color="danger"
+                  onClick={() =>
+                    firestore.delete({
+                      collection: 'notes',
+                      doc: note.id
+                    })
+                  }
+                >
+                  <IonIcon icon={trash} size="medium" />
+                </IonItemOption>
+              </IonItemOptions>
+            </IonItemSliding>
+          );
+        })}
+      </StyledIonList>
+    );
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -54,38 +126,7 @@ const Home = ({ notes, firestore }) => {
           <IonTitle>Notes App</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent color="primary">
-        <StyledIonList color="primary">
-          <StyledIonListHeader color="primary">Poznámky</StyledIonListHeader>
-          {notes &&
-            notes.map(note => {
-              return (
-                <IonItemSliding key={note.id}>
-                  <IonItem
-                    routerDirection="forward"
-                    routerLink={`/note/usernote/${note.id}`}
-                    detail
-                  >
-                    {note.heading}
-                  </IonItem>
-                  <IonItemOptions>
-                    <IonItemOption
-                      color="danger"
-                      onClick={() =>
-                        firestore.delete({
-                          collection: 'notes',
-                          doc: note.id
-                        })
-                      }
-                    >
-                      <IonIcon icon={trash} size="medium" />
-                    </IonItemOption>
-                  </IonItemOptions>
-                </IonItemSliding>
-              );
-            })}
-        </StyledIonList>
-      </IonContent>
+      <IonContent color="primary">{notesList}</IonContent>
     </IonPage>
   );
 };

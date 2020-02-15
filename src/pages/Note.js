@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import { connect } from 'react-redux';
 
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
+import 'firebase/storage';
 
 import { debounce } from '../shared/utility';
 
@@ -44,7 +45,8 @@ import {
   IonList,
   IonListHeader,
   IonLabel,
-  IonMenuToggle
+  IonMenuToggle,
+  IonLoading
 } from '@ionic/react';
 
 import { create, informationCircleOutline } from 'ionicons/icons';
@@ -110,6 +112,10 @@ const Note = ({
     percentage: null,
     ref: null
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  let content = null;
 
   useIonViewWillEnter(() => {
     try {
@@ -128,9 +134,9 @@ const Note = ({
   };
 
   useEffect(() => {
+    let unsubscribe;
     if (match.params.id) {
-      firebase
-        .firestore()
+      unsubscribe = firestore
         .collection('notes')
         .doc(match.params.id)
         .onSnapshot(doc => {
@@ -139,8 +145,7 @@ const Note = ({
           }
         });
     } else if (isNew.id) {
-      firebase
-        .firestore()
+      unsubscribe = firestore
         .collection('notes')
         .doc(isNew.id)
         .onSnapshot(doc => {
@@ -149,6 +154,11 @@ const Note = ({
           }
         });
     }
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [match.params.id, isNew, firestore]);
 
   useEffect(() => {
@@ -182,7 +192,19 @@ const Note = ({
     }
   });
 
+  useEffect(() => {
+    if ((noteHeading && noteText && !isNew.boolean) || isNew.boolean) {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    }
+  }, [noteHeading, noteText, isNew.boolean]);
+
   useIonViewWillLeave(() => {
+    if ((!noteHeading || noteText === '<p><br></p>') && note) {
+      console.log('happens');
+      handleDeleteNote();
+    }
     setNote(false);
     try {
       setTimeout(() => {
@@ -401,7 +423,7 @@ const Note = ({
   };
 
   const insertPhotoToNote = url => {
-    if (cursorPosition || cursorPosition === 0) {
+    if (cursorPosition) {
       quillRef.current.getEditor().insertEmbed(cursorPosition, 'image', url);
     } else {
       quillRef.current
@@ -433,6 +455,30 @@ const Note = ({
         history.goBack();
       });
   };
+
+  if (!isLoading) {
+    content = (
+      <form>
+        <StyledIonInput
+          type="string"
+          placeholder="Nadpis"
+          value={noteHeading}
+          name="heading"
+          onIonChange={handleNoteHeadingChange}
+          required={true}
+          className="ion-no-padding"
+        />
+        <StyledReactQuill
+          defaultValue={noteText}
+          onChange={handleNoteTextChange}
+          onChangeSelection={handleSelectionChange}
+          ref={quillRef}
+          modules={modules}
+        />
+      </form>
+    );
+  }
+
   return (
     <IonPage>
       {note && <InfoTab note={note} />}
@@ -459,27 +505,13 @@ const Note = ({
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding" color="primary" fullscreen={true}>
-        <form>
-          <StyledIonInput
-            type="string"
-            placeholder="Nadpis"
-            value={noteHeading}
-            name="heading"
-            onIonChange={handleNoteHeadingChange}
-            required={true}
-            className="ion-no-padding"
-          />
-          {(noteText || isNew) && (
-            <StyledReactQuill
-              defaultValue={noteText}
-              onChange={handleNoteTextChange}
-              onChangeSelection={handleSelectionChange}
-              ref={quillRef}
-              modules={modules}
-            />
-          )}
-        </form>
+        {content}
         {/* <InfoTab showInfoTab={showInfoTab} setShowInfoTab={setShowInfoTab} /> */}
+        <IonLoading
+          isOpen={isLoading}
+          message="Načítnání"
+          backdropDismiss={false}
+        />
         <ActionSheet
           showActionSheet={showActionSheet}
           setShowActionSheet={setShowActionSheet}

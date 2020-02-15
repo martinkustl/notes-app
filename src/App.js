@@ -77,7 +77,7 @@ const App = ({ auth }) => {
           <IonIcon icon={search} />
         </IonTabButton>
         <IonTabButton tab="add" href="/newnote">
-          <IonIcon icon={addCircleOutline} />
+          <IonIcon icon={addCircleOutline} color="success" />
         </IonTabButton>
         <IonTabButton tab="shared" href="/shared">
           <IonIcon icon={people} />
