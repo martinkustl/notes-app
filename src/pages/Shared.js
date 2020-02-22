@@ -3,7 +3,6 @@ import {
   IonPage,
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonContent,
   IonListHeader,
   IonItem
@@ -13,7 +12,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
 
-import { StyledIonList } from '../styles';
+import { StyledIonList, StyledIonTitle } from '../styles';
 
 import styled from 'styled-components';
 
@@ -29,7 +28,7 @@ const Shared = ({ notes }) => {
     <IonPage>
       <IonHeader>
         <IonToolbar color="primary">
-          <IonTitle>Sdílené poznámky</IonTitle>
+          <StyledIonTitle>Sdílené poznámky</StyledIonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent color="primary">

@@ -6,13 +6,14 @@ import {
   IonMenu,
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonContent,
   IonList,
   IonItem,
   IonLabel,
   IonListHeader
 } from '@ionic/react';
+
+import { StyledIonTitle } from '../../styles';
 
 const StyledIonListHeader = styled(IonListHeader)`
   font-size: 16px;
@@ -24,12 +25,6 @@ const StyledIonListHeader = styled(IonListHeader)`
 const StyledDateLabel = styled.span`
   font-size: 13px;
   color: #3b3b3b;
-`;
-
-const StyledIonTitle = styled(IonTitle)`
-  &.ios {
-    padding: 0;
-  }
 `;
 
 const InfoTab = ({ note }) => {

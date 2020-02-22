@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import { connect } from 'react-redux';
 
-import * as firebase from 'firebase/app';
+import * as firebase from 'firebase';
 import 'firebase/storage';
 
 import { debounce } from '../shared/utility';
@@ -113,11 +113,11 @@ const Note = ({
     ref: null
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   let content = null;
 
   useIonViewWillEnter(() => {
+    checkConnectionStatus();
     try {
       setTimeout(() => {
         onIsNoteOpenChange(true);
@@ -126,6 +126,66 @@ const Note = ({
       console.error(err);
     }
   });
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .doc('/status/' + uid)
+      .onSnapshot(doc => console.log(doc.data()));
+  });
+
+  const checkConnectionStatus = () => {
+    /* var uid = firebase.auth().currentUser.uid; */
+    var userStatusDatabaseRef = firebase.database().ref('/status/' + uid);
+
+    var isOfflineForDatabase = {
+      state: 'offline',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    var isOnlineForDatabase = {
+      state: 'online',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    // [END_EXCLUDE]
+    var userStatusFirestoreRef = firebase.firestore().doc('/status/' + uid);
+
+    // Firestore uses a different server timestamp value, so we'll
+    // create two more constants for Firestore state.
+    var isOfflineForFirestore = {
+      state: 'offline',
+      last_changed: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    var isOnlineForFirestore = {
+      state: 'online',
+      last_changed: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    firebase
+      .database()
+      .ref('.info/connected')
+      .on('value', function(snapshot) {
+        if (snapshot.val() == false) {
+          // Instead of simply returning, we'll also set Firestore's state
+          // to 'offline'. This ensures that our Firestore cache is aware
+          // of the switch to 'offline.'
+          userStatusFirestoreRef.set(isOfflineForFirestore);
+          return;
+        }
+
+        userStatusDatabaseRef
+          .onDisconnect()
+          .set(isOfflineForDatabase)
+          .then(function() {
+            userStatusDatabaseRef.set(isOnlineForDatabase);
+
+            // We'll also add Firestore set here for when we come online.
+            userStatusFirestoreRef.set(isOnlineForFirestore);
+          });
+      });
+  };
 
   const modules = {
     clipboard: {
@@ -141,6 +201,7 @@ const Note = ({
         .doc(match.params.id)
         .onSnapshot(doc => {
           if (doc.data()) {
+            console.log(doc.data());
             setNote({ ...doc.data(), id: match.params.id });
           }
         });
@@ -165,10 +226,8 @@ const Note = ({
     if (quillRef.current && note) {
       const quillHTML = quillRef.current.getEditor().root.innerHTML;
       if (quillHTML === note.content) {
-        console.log('Database and user content are equal');
+        // Database and user content are equal
       } else {
-        console.log('Database and user content are not equal');
-        // console.log()
         setNoteHeading(note.heading);
         setNoteText(note.content);
         quillRef.current
@@ -201,8 +260,18 @@ const Note = ({
   }, [noteHeading, noteText, isNew.boolean]);
 
   useIonViewWillLeave(() => {
-    if ((!noteHeading || noteText === '<p><br></p>') && note) {
-      console.log('happens');
+    if (!noteHeading && noteText && noteText !== '<p><br></p>') {
+      handleSubmitNote(
+        'Bez názvu',
+        noteText,
+        note,
+        uid,
+        ownerName,
+        isNew,
+        match.params.id,
+        true
+      );
+    } else if ((!noteHeading || noteText === '<p><br></p>') && note) {
       handleDeleteNote();
     }
     setNote(false);
@@ -211,60 +280,64 @@ const Note = ({
         onIsNoteOpenChange(false);
       }, 300);
     } catch (err) {}
-    //onIsNoteOpenChange(false);
   });
 
   const handleSubmitNote = useCallback(
-    debounce((heading, content, note, uid, ownerName, isNew, params) => {
-      let submitNote;
-      if (isNew.boolean) {
-        submitNote = {
-          heading: heading,
-          content: content
-        };
-        firestore
-          .add(
-            { collection: 'notes' },
-            {
-              ...note,
-              ownerId: uid,
-              ownerName,
-              content: submitNote.content,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              heading: submitNote.heading
-            }
-          )
-          .then(docRef => {
-            setIsNew({ boolean: false, id: docRef.id });
-          })
-          .catch(err => {
-            console.error(err);
-          });
-      } else {
-        if (params) {
+    debounce(
+      (heading, content, note, uid, ownerName, isNew, params, isLeaving) => {
+        let submitNote;
+        if (isNew.boolean) {
           submitNote = {
-            id: params,
             heading: heading,
-            content: content,
-            updatedAt: new Date()
+            content: content
           };
-        } else if (note.id) {
-          submitNote = {
-            id: note.id,
-            heading: heading,
-            content: content,
-            updatedAt: new Date()
-          };
+          firestore
+            .add(
+              { collection: 'notes' },
+              {
+                ...note,
+                ownerId: uid,
+                ownerName,
+                content: submitNote.content,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                heading: submitNote.heading
+              }
+            )
+            .then(docRef => {
+              if (!isLeaving) {
+                setIsNew({ boolean: false, id: docRef.id });
+              }
+            })
+            .catch(err => {
+              console.error(err);
+            });
         } else {
-          console.error('Error note id unassigned');
+          if (params) {
+            submitNote = {
+              id: params,
+              heading: heading,
+              content: content,
+              updatedAt: new Date()
+            };
+          } else if (note.id) {
+            submitNote = {
+              id: note.id,
+              heading: heading,
+              content: content,
+              updatedAt: new Date()
+            };
+          } else {
+            console.error('Error note id unassigned');
+          }
+          firestore.update(
+            { collection: 'notes', doc: submitNote.id },
+            submitNote
+          );
         }
-        firestore.update(
-          { collection: 'notes', doc: submitNote.id },
-          submitNote
-        );
-      }
-    }, 1500),
+      },
+      1500
+    ),
     []
   );
 
@@ -319,7 +392,19 @@ const Note = ({
         uid,
         ownerName,
         isNew,
-        match.params.id
+        match.params.id,
+        false
+      );
+    } else if (e.target.value.length === 0 && noteText) {
+      handleSubmitNote(
+        '',
+        noteText,
+        note,
+        uid,
+        ownerName,
+        isNew,
+        match.params.id,
+        false
       );
     }
   };
@@ -504,7 +589,12 @@ const Note = ({
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding" color="primary" fullscreen={true}>
+      <IonContent
+        className="ion-padding"
+        color="primary"
+        fullscreen={true}
+        forceOverscroll={true}
+      >
         {content}
         {/* <InfoTab showInfoTab={showInfoTab} setShowInfoTab={setShowInfoTab} /> */}
         <IonLoading

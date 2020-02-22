@@ -48,17 +48,6 @@ setupConfig({
 const App = ({ auth }) => {
   const [isNoteOpen, setIsNoteOpen] = useState(false);
 
-  /*   useEffect(() => {
-    var connectedRef = firebase.database().ref('.info/connected');
-    connectedRef.on('value', function(snap) {
-      if (snap.val() === true) {
-        console.log('connected');
-      } else {
-        console.log('not connected');
-      }
-    });
-  }); */
-
   let tabButtons = null;
 
   const onIsNoteOpenChange = state => {
@@ -88,8 +77,6 @@ const App = ({ auth }) => {
 
   let routes = (
     <IonRouterOutlet id="main">
-      {/* <Route path="/auth" component={Auth} /> */}
-      {/* <Route path="/" render={() => <Redirect to="/auth" />} exact={true} /> */}
       <Route path="/" component={Auth} />
     </IonRouterOutlet>
   );
@@ -121,7 +108,6 @@ const App = ({ auth }) => {
             />
             <Route
               path="/newnote"
-              /* component={NewNoteModal} */
               exact={true}
               render={props => (
                 <Note
@@ -134,12 +120,7 @@ const App = ({ auth }) => {
             />
             <Route path="/search" component={Search} exact={true} />
             <Route path="/shared" component={Shared} exact={true} />
-            <Route
-              path="/"
-              /* render={() => <Redirect to="/home" />} */
-              component={Home}
-              exact={true}
-            />
+            <Route path="/" component={Home} exact={true} />
           </IonRouterOutlet>
           {tabButtons}
         </IonTabs>

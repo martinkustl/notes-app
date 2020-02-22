@@ -292,7 +292,11 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
             <IonItem key={formElement.id}>
               <IonLabel position="floating">
                 <IonText color="dark">{formElement.config.label}</IonText>
-                <IonText color="danger">*</IonText>
+                <IonText color="danger">
+                  {formElement.id === 'password'
+                    ? ' *(Minimálně 6 znaků)'
+                    : ' *'}
+                </IonText>
               </IonLabel>
               <Input
                 elementType={formElement.config.elementType}
