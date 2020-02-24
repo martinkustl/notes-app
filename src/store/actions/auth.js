@@ -17,7 +17,9 @@ export const signUp = newUser => {
           });
       })
       .then(() => {
-        dispatch({ type: actionTypes.SIGNUP_SUCCESS });
+        firebase
+          .updateEmail(newUser.email, true)
+          .then(() => dispatch({ type: actionTypes.SIGNUP_SUCCESS }));
       })
       .catch(err => {
         console.log(err);

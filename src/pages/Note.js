@@ -155,6 +155,7 @@ const Note = ({
         });
     }
     return () => {
+      console.log(unsubscribe);
       if (unsubscribe) {
         unsubscribe();
       }
@@ -547,7 +548,7 @@ const Note = ({
         <IonLoading
           isOpen={isLoading}
           message="Načítnání"
-          backdropDismiss={false}
+          backdropDismiss={true}
         />
         <ActionSheet
           showActionSheet={showActionSheet}

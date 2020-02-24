@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 import * as actionCreators from '../store/actions/index';
 
 import Input from '../UI/Input';
 import { checkValidity } from '../shared/utility';
 
-import { useFirebase } from 'react-redux-firebase';
+import { useFirebase, firestoreConnect } from 'react-redux-firebase';
+import { actionTypes } from 'redux-firestore';
 
 import useErrorMessage from '../shared/useErrorMessage';
 
@@ -94,6 +96,13 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
   useIonViewDidLeave(() => {
     setLoginLoading(false);
   });
+
+  useEffect(() => {
+    /* .then(() => { */
+    // Clear redux-firestore state on logout
+    /* dispatch({ type: actionTypes.CLEAR_DATA }) */
+    /* }); */
+  }, [firebase]);
 
   const [signUpForm, setSignUpForm] = useState({
     name: {
@@ -474,4 +483,12 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Auth);
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  firestoreConnect(props => {
+    props.firebase.logout().then(() => {
+      props.dispatch({ type: actionTypes.CLEAR_DATA });
+    });
+    return [];
+  })
+)(Auth);

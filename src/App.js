@@ -136,7 +136,6 @@ const App = ({ auth }) => {
         <HomeMenu />
         <IonTabs>
           <IonRouterOutlet id="main">
-            <Route path="/home" exact={true} component={Home} />
             <Route
               path="/note/usernote/:id"
               exact={true}
@@ -167,6 +166,7 @@ const App = ({ auth }) => {
                 />
               )}
             />
+            <Route path="/home" exact={true} component={Home} />
             <Route path="/search" component={Search} exact={true} />
             <Route path="/shared" component={Shared} exact={true} />
             <Route path="/" component={Home} exact={true} />
@@ -185,6 +185,7 @@ const App = ({ auth }) => {
 };
 
 const mapStateToProps = state => {
+  console.log(state);
   return {
     auth: state.firebase.auth
   };
