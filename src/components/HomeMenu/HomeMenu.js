@@ -34,7 +34,6 @@ const HomeMenu = ({ userEmail, userName, uid }) => {
   const {
     isError,
     errorMessage,
-    fbMessage,
     setErrorMessage,
     handleClearError
   } = useErrorMessage();
@@ -122,7 +121,6 @@ const HomeMenu = ({ userEmail, userName, uid }) => {
           isError={isError}
           errorMessage={errorMessage}
           handleConfirmErrorClick={handleConfirmErrorClick}
-          fbMessage={fbMessage}
         />
       </IonContent>
     </IonMenu>

@@ -8,6 +8,8 @@ import { checkValidity } from '../shared/utility';
 
 import { useFirebase } from 'react-redux-firebase';
 
+import useErrorMessage from '../shared/useErrorMessage';
+
 import {
   IonContent,
   IonHeader,
@@ -51,9 +53,16 @@ const StyledIonLoading = styled(IonLoading)`
 const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
   const [isValid, setIsValid] = useState(false);
   const [isSignUp, setIsSignUp] = useState(true);
-  const [error, setError] = useState({ isPresent: false, message: '' });
   const [loginLoading, setLoginLoading] = useState(false);
   const [showPassResetForm, setShowPassResetForm] = useState(false);
+
+  const {
+    isError,
+    errorMessage,
+    fbMessage,
+    setErrorMessage,
+    handleClearError
+  } = useErrorMessage();
 
   const firebase = useFirebase();
 
@@ -63,70 +72,24 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
 
   useEffect(() => {
     if (loginError) {
-      switch (loginError.code) {
-        case 'auth/user-not-found':
-          setError(prevState => {
-            return {
-              ...prevState,
-              isPresent: true,
-              message: 'Chybné přihlašovací údaje'
-            };
-          });
-          setLoginLoading(false);
-          break;
-        case 'auth/wrong-password':
-          setError(prevState => {
-            return {
-              ...prevState,
-              isPresent: true,
-              message: 'Chybné přihlašovací údaje'
-            };
-          });
-          setLoginLoading(false);
-          break;
-        case 'auth/network-request-failed':
-          setError(prevState => {
-            return {
-              ...prevState,
-              isPresent: true,
-              message: 'Nemáte připojení k internetu'
-            };
-          });
-          setLoginLoading(false);
-          break;
-        default:
-          setError(prevState => {
-            return { ...prevState, isPresent: true, message: 'Neznámá chyba' };
-          });
-          setLoginLoading(false);
+      setErrorMessage(loginError);
+      if (isError && errorMessage) {
+        setLoginLoading(false);
+      } else if (isError && fbMessage) {
+        setLoginLoading(false);
       }
     } else if (signUpError) {
-      switch (signUpError.code) {
-        case 'auth/email-already-in-use':
-          setError(prevState => {
-            return {
-              ...prevState,
-              isPresent: true,
-              message: 'Email je již využíván jiným účtem'
-            };
-          });
-          break;
-        case 'auth/network-request-failed':
-          setError(prevState => {
-            return {
-              ...prevState,
-              isPresent: true,
-              message: 'Nemáte připojení k internetu'
-            };
-          });
-          break;
-        default:
-          setError(prevState => {
-            return { ...prevState, isPresent: true, message: 'Neznámá chyba' };
-          });
-      }
+      setErrorMessage(signUpError);
     }
-  }, [loginError, signUpError]);
+  }, [
+    loginError,
+    signUpError,
+    errorMessage,
+    fbMessage,
+    handleClearError,
+    isError,
+    setErrorMessage
+  ]);
 
   useIonViewDidLeave(() => {
     setLoginLoading(false);
@@ -266,13 +229,7 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
 
   const submitLogin = e => {
     e.preventDefault();
-    setError(prevState => {
-      return {
-        ...prevState,
-        isPresent: false,
-        message: ''
-      };
-    });
+    handleClearError();
     setLoginLoading(true);
     firebase.login({
       email: loginForm.email.value,
@@ -284,22 +241,28 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
     setIsSignUp(prevState => !prevState);
   };
 
-  const handlePassReset = email => {
-    /* checkValidity(event.target.value, state[controlName].validation), */
+  const handlePassReset = data => {
     const validityRequirements = { required: true, isEmail: true };
-    const isValid = checkValidity(email, validityRequirements);
+    const isValid = checkValidity(data.email, validityRequirements);
     if (isValid) {
       firebase
         .auth()
-        .sendPasswordResetEmail(email)
+        .sendPasswordResetEmail(data.email)
         .then(() => {
-          console.log('email changed');
+          console.log('password changed');
         })
         .catch(error => {
           // An error happened.
+          setErrorMessage(error);
           console.log(error);
+          return false;
         });
     } else {
+      setErrorMessage({
+        code: 'invalid-email-input',
+        message: 'Nejedná se o firebase akci. Message generována vývojářem'
+      });
+      return false;
     }
   };
 
@@ -429,10 +392,10 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
           message="Načítnání"
           backdropDismiss={true}
         />
-        {error.isPresent && (
+        {isError && (
           <IonToast
             isOpen={true}
-            message={error.message}
+            message={errorMessage}
             position="top"
             duration={2000}
           />
@@ -482,8 +445,8 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
                 text: 'Potvrdit',
                 cssClass: classes.alertButton,
                 handler: data => {
-                  if (data.email) {
-                    handlePassReset(data.email);
+                  if (handlePassReset(data)) {
+                    return true;
                   } else {
                     return false;
                   }

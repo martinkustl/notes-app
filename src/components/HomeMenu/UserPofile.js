@@ -54,7 +54,6 @@ const UserPofile = ({
   isLoading,
   isError,
   errorMessage,
-  fbMessage,
   handleConfirmErrorClick
 }) => {
   const [editProfile, setEditProfile] = useState(false);
@@ -70,7 +69,7 @@ const UserPofile = ({
       <StyledIonAlert
         isOpen={true}
         header="Chyba"
-        message={errorMessage ? errorMessage : fbMessage}
+        message={errorMessage}
         onDidDismiss={() => handleConfirmErrorClick()}
         color="primary"
         backdropDismiss={false}
