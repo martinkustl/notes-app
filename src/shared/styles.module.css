@@ -1,0 +1,7 @@
+.alertButtonDanger {
+  color: var(--ion-color-danger) !important;
+}
+
+.alertButton {
+  color: var(--ion-color-secondary) !important;
+}

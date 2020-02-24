@@ -67,13 +67,6 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-tint: #f5f6f9;
 }
 
-ion-list-header {
-  /* font-size: 17px;
-  min-height: 0;
-  height: 30px;
-  line-height: 30px; */
-}
-
 ion-item {
   --background: var(--ion-color-primary);
   --border-color: var(--ion-color-medium);
@@ -122,11 +115,15 @@ ion-button {
   box-shadow: none !important;
 }
 
-/* ion-textarea {
-  --background: pink;
-  --color: pink;
-} */
-
 * {
   font-family: Arial, Helvetica, sans-serif !important;
+}
+
+ion-alert {
+  --background: var(--ion-color-primary) !important;
+}
+
+.alert-input {
+  border: 1px solid var(--ion-color-medium) !important;
+  background-color: var(--ion-color-primary) !important;
 }

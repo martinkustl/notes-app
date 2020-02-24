@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import { connect } from 'react-redux';
 
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import 'firebase/storage';
 
 import { debounce } from '../shared/utility';
@@ -95,7 +95,8 @@ const Note = ({
   isNewNote,
   uid,
   ownerName,
-  firestore
+  firestore,
+  connectionStatus
 }) => {
   const [note, setNote] = useState(false);
   const [noteHeading, setNoteHeading] = useState('');
@@ -117,7 +118,6 @@ const Note = ({
   let content = null;
 
   useIonViewWillEnter(() => {
-    checkConnectionStatus();
     try {
       setTimeout(() => {
         onIsNoteOpenChange(true);
@@ -126,66 +126,6 @@ const Note = ({
       console.error(err);
     }
   });
-
-  useEffect(() => {
-    firebase
-      .firestore()
-      .doc('/status/' + uid)
-      .onSnapshot(doc => console.log(doc.data()));
-  });
-
-  const checkConnectionStatus = () => {
-    /* var uid = firebase.auth().currentUser.uid; */
-    var userStatusDatabaseRef = firebase.database().ref('/status/' + uid);
-
-    var isOfflineForDatabase = {
-      state: 'offline',
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    var isOnlineForDatabase = {
-      state: 'online',
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    // [END_EXCLUDE]
-    var userStatusFirestoreRef = firebase.firestore().doc('/status/' + uid);
-
-    // Firestore uses a different server timestamp value, so we'll
-    // create two more constants for Firestore state.
-    var isOfflineForFirestore = {
-      state: 'offline',
-      last_changed: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    var isOnlineForFirestore = {
-      state: 'online',
-      last_changed: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    firebase
-      .database()
-      .ref('.info/connected')
-      .on('value', function(snapshot) {
-        if (snapshot.val() == false) {
-          // Instead of simply returning, we'll also set Firestore's state
-          // to 'offline'. This ensures that our Firestore cache is aware
-          // of the switch to 'offline.'
-          userStatusFirestoreRef.set(isOfflineForFirestore);
-          return;
-        }
-
-        userStatusDatabaseRef
-          .onDisconnect()
-          .set(isOfflineForDatabase)
-          .then(function() {
-            userStatusDatabaseRef.set(isOnlineForDatabase);
-
-            // We'll also add Firestore set here for when we come online.
-            userStatusFirestoreRef.set(isOnlineForFirestore);
-          });
-      });
-  };
 
   const modules = {
     clipboard: {
@@ -201,7 +141,6 @@ const Note = ({
         .doc(match.params.id)
         .onSnapshot(doc => {
           if (doc.data()) {
-            console.log(doc.data());
             setNote({ ...doc.data(), id: match.params.id });
           }
         });
@@ -498,7 +437,6 @@ const Note = ({
         console.log(err);
       },
       () => {
-        console.log('Image uploaded');
         uploadTask.snapshot.ref.getDownloadURL().then(url => {
           insertPhotoToNote(url);
           setUploadingImage({ isOpen: false, percentage: null, ref: null });
@@ -535,7 +473,6 @@ const Note = ({
         doc: note.id
       })
       .then(res => {
-        console.log(res);
         setNote();
         history.goBack();
       });
@@ -564,6 +501,18 @@ const Note = ({
     );
   }
 
+  let footerContent = null;
+
+  if (connectionStatus) {
+    footerContent = (
+      <NoteActionButtons
+        handleTakePhoto={handleTakePhoto}
+        handlePickGalleryPhoto={handlePickGalleryPhoto}
+        connectionStatus={connectionStatus[0]}
+      />
+    );
+  }
+
   return (
     <IonPage>
       {note && <InfoTab note={note} />}
@@ -572,7 +521,6 @@ const Note = ({
           <IonButtons slot="start">
             <IonBackButton defaultHref="/" color="secondary" />
           </IonButtons>
-          {/* <IonTitle>Cesta k poznámce</IonTitle> */}
           <IonButtons slot="end">
             <IonMenuToggle menu="infoTabMenu">
               <IonButton type="button" color="secondary">
@@ -596,7 +544,6 @@ const Note = ({
         forceOverscroll={true}
       >
         {content}
-        {/* <InfoTab showInfoTab={showInfoTab} setShowInfoTab={setShowInfoTab} /> */}
         <IonLoading
           isOpen={isLoading}
           message="Načítnání"
@@ -648,12 +595,7 @@ const Note = ({
           </StyledUploadProgressDiv>
         </StyledUploadImageModal>
       </IonContent>
-      <IonFooter>
-        <NoteActionButtons
-          handleTakePhoto={handleTakePhoto}
-          handlePickGalleryPhoto={handlePickGalleryPhoto}
-        />
-      </IonFooter>
+      <IonFooter>{footerContent}</IonFooter>
     </IonPage>
   );
 };
@@ -661,13 +603,19 @@ const Note = ({
 const mapStateToProps = state => {
   return {
     uid: state.firebase.auth.uid,
-    ownerName: state.firebase.profile.userName
+    ownerName: state.firebase.profile.userName,
+    connectionStatus: state.firestore.ordered.status
   };
 };
 
 export default compose(
   connect(mapStateToProps, null),
   firestoreConnect(props => {
-    return [];
+    return [
+      {
+        collection: 'status',
+        doc: `${props.uid}`
+      }
+    ];
   })
 )(Note);

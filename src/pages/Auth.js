@@ -20,12 +20,16 @@ import {
   IonButton,
   IonLoading,
   IonToast,
-  useIonViewDidLeave
+  useIonViewDidLeave,
+  IonAlert,
+  useIonViewDidEnter
 } from '@ionic/react';
 
 import styled from 'styled-components';
 
 import { StyledIonList } from '../styles';
+
+import classes from '../shared/styles.module.css';
 
 const StyledCenterItems = styled.div`
   display: flex;
@@ -49,8 +53,13 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
   const [isSignUp, setIsSignUp] = useState(true);
   const [error, setError] = useState({ isPresent: false, message: '' });
   const [loginLoading, setLoginLoading] = useState(false);
+  const [showPassResetForm, setShowPassResetForm] = useState(false);
 
   const firebase = useFirebase();
+
+  useIonViewDidEnter(() => {
+    setLoginLoading(false);
+  });
 
   useEffect(() => {
     if (loginError) {
@@ -275,6 +284,25 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
     setIsSignUp(prevState => !prevState);
   };
 
+  const handlePassReset = email => {
+    /* checkValidity(event.target.value, state[controlName].validation), */
+    const validityRequirements = { required: true, isEmail: true };
+    const isValid = checkValidity(email, validityRequirements);
+    if (isValid) {
+      firebase
+        .auth()
+        .sendPasswordResetEmail(email)
+        .then(() => {
+          console.log('email changed');
+        })
+        .catch(error => {
+          // An error happened.
+          console.log(error);
+        });
+    } else {
+    }
+  };
+
   let form = null;
   if (isSignUp) {
     const formElementsArray = [];
@@ -409,13 +437,61 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
             duration={2000}
           />
         )}
-        {/*  <p>{error.message}</p> */}
         <StyledCenterItems>
           <IonButton color="secondary" fill="clear" onClick={switchForm}>
             Přepnout na
             {isSignUp ? ' přihlášení' : ' registraci'}
           </IonButton>
         </StyledCenterItems>
+        {!isSignUp && (
+          <StyledCenterItems>
+            <IonButton
+              fill="clear"
+              shape="round"
+              type="button"
+              onClick={() => setShowPassResetForm(true)}
+              color="dark"
+            >
+              Zapomenuté heslo
+            </IonButton>
+          </StyledCenterItems>
+        )}
+        {showPassResetForm && (
+          <IonAlert
+            isOpen={true}
+            onDidDismiss={() => setShowPassResetForm(false)}
+            header="Zapomenuté heslo"
+            inputs={[
+              {
+                name: 'email',
+                type: 'email',
+                placeholder: 'Zadejte váš email',
+                required: true
+              }
+            ]}
+            buttons={[
+              {
+                text: 'Zrušit',
+                role: 'cancel',
+                cssClass: classes.alertButtonDanger,
+                handler: () => {
+                  setShowPassResetForm(false);
+                }
+              },
+              {
+                text: 'Potvrdit',
+                cssClass: classes.alertButton,
+                handler: data => {
+                  if (data.email) {
+                    handlePassReset(data.email);
+                  } else {
+                    return false;
+                  }
+                }
+              }
+            ]}
+          />
+        )}
       </IonContent>
     </IonPage>
   );
@@ -425,8 +501,7 @@ const mapStateToProps = state => {
   return {
     loginError: state.firebase.authError,
     signUpError: state.auth.error,
-    signUpLoading: state.auth.loading,
-    loginLoading: state.firebase.auth.isLoaded
+    signUpLoading: state.auth.loading
   };
 };
 

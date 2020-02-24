@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import styled from 'styled-components';
 
-import { isPlatform } from '@ionic/react';
+import { isPlatform, IonToolbar } from '@ionic/react';
 
 import CameraButton from './CameraButton';
 import GalleryButton from './GalleryButton';
@@ -15,7 +15,17 @@ const StyledNoteCustomFooter = styled.footer`
   border-top: 1px solid var(--ion-color-medium);
 `;
 
-const NoteActionButtons = ({ handleTakePhoto, handlePickGalleryPhoto }) => {
+const StyledOfflineMessage = styled.p`
+  text-align: center;
+  color: var(--ion-color-danger);
+  margin: 0;
+`;
+
+const NoteActionButtons = ({
+  handleTakePhoto,
+  handlePickGalleryPhoto,
+  connectionStatus
+}) => {
   const [mode, setMode] = useState();
 
   useEffect(() => {
@@ -24,21 +34,30 @@ const NoteActionButtons = ({ handleTakePhoto, handlePickGalleryPhoto }) => {
     }
   }, []);
 
-  return (
-    <StyledNoteCustomFooter>
-      <CameraButton mode={mode} handleTakePhoto={handleTakePhoto} />
-      {/* <StyledCustomButton className="ion-activatable">
-        <IonIcon icon={images} size="large" />
-        {mode === 'android' && (
-          <IonRippleEffect type="bounded"></IonRippleEffect>
-        )}
-      </StyledCustomButton> */}
-      <GalleryButton
-        mode={mode}
-        handlePickGalleryPhoto={handlePickGalleryPhoto}
-      />
-    </StyledNoteCustomFooter>
-  );
+  let content = null;
+
+  if (connectionStatus.state === 'online') {
+    content = (
+      <Fragment>
+        <CameraButton mode={mode} handleTakePhoto={handleTakePhoto} />
+        <GalleryButton
+          mode={mode}
+          handlePickGalleryPhoto={handlePickGalleryPhoto}
+        />
+      </Fragment>
+    );
+  } else if (connectionStatus.state === 'offline') {
+    content = (
+      <IonToolbar color="primary">
+        <StyledOfflineMessage>
+          Jste offline. Pro pořízení a zobrazení fotek je nutné připojení k
+          internetu.
+        </StyledOfflineMessage>
+      </IonToolbar>
+    );
+  }
+
+  return <StyledNoteCustomFooter>{content}</StyledNoteCustomFooter>;
 };
 
 export default NoteActionButtons;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   IonHeader,
@@ -11,13 +11,140 @@ import {
   IonIcon,
   IonList,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonInput,
+  IonLoading,
+  IonAlert
 } from '@ionic/react';
-import { connect } from 'react-redux';
 
 import { create } from 'ionicons/icons';
 
-const UserPofile = ({ userName, userEmail, openProfile, setOpenProfile }) => {
+import classes from './UserProfile.module.css';
+
+import styled from 'styled-components';
+
+const StyledIonlabel = styled(IonLabel)`
+  --color: black;
+  color: black !important;
+`;
+
+const StyledFormButtonsWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: var(--ion-color-primary);
+  padding: 2rem 1rem 0 1rem;
+`;
+
+const StyledIonInput = styled(IonInput)`
+  pointer-events: none;
+`;
+
+const StyledIonAlert = styled(IonAlert)`
+  --background: var(--ion-color-primary);
+`;
+
+const UserPofile = ({
+  userName,
+  userEmail,
+  openProfile,
+  setOpenProfile,
+  handleSubmitProfileChange,
+  isLoading,
+  isError,
+  errorMessage,
+  fbMessage,
+  handleConfirmErrorClick
+}) => {
+  const [editProfile, setEditProfile] = useState(false);
+
+  let content = null;
+
+  let responseComponent = null;
+
+  if (isLoading && !isError) {
+    responseComponent = <IonLoading isOpen={true} message="Provádím změny" />;
+  } else if (isError) {
+    responseComponent = (
+      <StyledIonAlert
+        isOpen={true}
+        header="Chyba"
+        message={errorMessage ? errorMessage : fbMessage}
+        onDidDismiss={() => handleConfirmErrorClick()}
+        color="primary"
+        backdropDismiss={false}
+        buttons={[
+          {
+            text: 'Rozumím',
+            cssClass: classes.alertButton,
+            handler: () => handleConfirmErrorClick()
+          }
+        ]}
+      />
+    );
+  }
+
+  if (editProfile) {
+    content = (
+      <IonList className="ion-no-padding">
+        <form
+          onSubmit={e => {
+            handleSubmitProfileChange(e);
+            setEditProfile(false);
+          }}
+        >
+          <IonItem lines="bottom">
+            <StyledIonlabel position="stacked">Jméno</StyledIonlabel>
+            <IonInput readonly={false} value={userName} name="name" />
+          </IonItem>
+          <IonItem lines="bottom">
+            <StyledIonlabel position="stacked">Email</StyledIonlabel>
+            <IonInput readonly={false} value={userEmail} name="email" />
+          </IonItem>
+          <StyledFormButtonsWrapper>
+            <IonButton
+              slot="start"
+              expand="block"
+              color="success"
+              fill="outline"
+              type="submit"
+            >
+              Potvrdit změny
+            </IonButton>
+            <IonButton
+              slot="end"
+              expand="block"
+              color="danger"
+              fill="outline"
+              type="button"
+              onClick={() => setEditProfile(false)}
+            >
+              Zrušit změny
+            </IonButton>
+          </StyledFormButtonsWrapper>
+        </form>
+      </IonList>
+    );
+  } else {
+    content = (
+      <IonList className="ion-no-padding">
+        <IonItem lines="bottom">
+          <IonLabel position="stacked">Jméno</IonLabel>
+          <StyledIonInput readonly={true} value={userName} name="name" />
+        </IonItem>
+        <IonItem lines="bottom">
+          <IonLabel position="stacked">Email</IonLabel>
+          <StyledIonInput readonly={true} value={userEmail} name="email" />
+        </IonItem>
+      </IonList>
+    );
+  }
+
+  const handleEditProfileChange = () => {
+    setEditProfile(prevState => !prevState);
+  };
+
   return (
     <IonModal
       isOpen={openProfile}
@@ -37,60 +164,22 @@ const UserPofile = ({ userName, userEmail, openProfile, setOpenProfile }) => {
           </IonButtons>
           <IonTitle>Můj profil</IonTitle>
           <IonButtons slot="end">
-            {/* <IonButton
+            <IonButton
               type="button"
-              // onClick={() => setEditShareList(prevState => !prevState)}
+              onClick={handleEditProfileChange}
               color="secondary"
             >
               <IonIcon icon={create} />
-            </IonButton> */}
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent color="primary">
-        <IonList className="ion-no-padding">
-          <IonItem lines="none">
-            <IonLabel>
-              Jméno:
-              {userName}
-            </IonLabel>
-          </IonItem>
-          <IonItem lines="none">
-            Email:
-            <IonLabel>{userEmail}</IonLabel>
-          </IonItem>
-        </IonList>
+        {content}
+        {responseComponent}
       </IonContent>
     </IonModal>
   );
 };
 
-const mapStateToProps = state => {
-  return {
-    userEmail: state.firebase.auth.email,
-    userName: state.firebase.profile.userName
-  };
-};
-/* 
-  const mapDispatchToProps = dispatch => {
-    return {
-      onDeleteNote: id => dispatch(actionCreators.deleteNote(id))
-      //onDeleteNote: id => dispatch()
-    };
-  };
-   */
-/*   export default compose(
-    connect(mapStateToProps, null),
-    firestoreConnect(props => {
-      return [
-        {
-          collection: 'notes',
-          where: ['ownerId', '==', props.auth.uid],
-          orderBy: ['updatedAt', 'desc'],
-          storeAs: 'userNotes'
-        }
-      ];
-    })
-  )(UserPofile); */
-
-export default connect(mapStateToProps, null)(UserPofile);
+export default UserPofile;

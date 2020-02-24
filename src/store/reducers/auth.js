@@ -17,7 +17,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SIGNUP_SUCCESS:
       return {
         ...state,
-        error: null
+        error: null,
+        loading: false
       };
     case actionTypes.SIGNUP_ERROR:
       return {

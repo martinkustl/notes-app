@@ -1,7 +1,11 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import { Route } from 'react-router-dom';
 
+import 'firebase/database';
+
 import { connect } from 'react-redux';
+
+import { useFirebase, useFirestore } from 'react-redux-firebase';
 
 import {
   IonApp,
@@ -48,7 +52,52 @@ setupConfig({
 const App = ({ auth }) => {
   const [isNoteOpen, setIsNoteOpen] = useState(false);
 
+  const firebase = useFirebase();
+  const firestore = useFirestore();
+
   let tabButtons = null;
+
+  useEffect(() => {
+    var userStatusDatabaseRef = firebase.database().ref('/status/' + auth.uid);
+    var isOfflineForDatabase = {
+      state: 'offline',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    var isOnlineForDatabase = {
+      state: 'online',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+    var userStatusFirestoreRef = firestore.doc('/status/' + auth.uid);
+
+    var isOfflineForFirestore = {
+      state: 'offline',
+      last_changed: firestore.FieldValue.serverTimestamp()
+    };
+
+    var isOnlineForFirestore = {
+      state: 'online',
+      last_changed: firestore.FieldValue.serverTimestamp()
+    };
+
+    firebase
+      .database()
+      .ref('.info/connected')
+      .on('value', function(snapshot) {
+        if (snapshot.val() === false) {
+          userStatusFirestoreRef.set(isOfflineForFirestore);
+          return;
+        }
+
+        userStatusDatabaseRef
+          .onDisconnect()
+          .set(isOfflineForDatabase)
+          .then(function() {
+            userStatusDatabaseRef.set(isOnlineForDatabase);
+            userStatusFirestoreRef.set(isOnlineForFirestore);
+          });
+      });
+  }, [auth.uid, firebase, firestore]);
 
   const onIsNoteOpenChange = state => {
     setIsNoteOpen(state);
@@ -130,7 +179,6 @@ const App = ({ auth }) => {
 
   return (
     <IonApp>
-      {/* <HomeMenu /> */}
       <IonReactRouter>{routes}</IonReactRouter>
     </IonApp>
   );
