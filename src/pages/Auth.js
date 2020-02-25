@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 import { connect } from 'react-redux';
-import { compose } from 'redux';
 import * as actionCreators from '../store/actions/index';
 
 import Input from '../UI/Input';
 import { checkValidity } from '../shared/utility';
 
-import { useFirebase, firestoreConnect } from 'react-redux-firebase';
-import { actionTypes } from 'redux-firestore';
+import { useFirebase } from 'react-redux-firebase';
 
 import useErrorMessage from '../shared/useErrorMessage';
 
@@ -96,13 +94,6 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
   useIonViewDidLeave(() => {
     setLoginLoading(false);
   });
-
-  useEffect(() => {
-    /* .then(() => { */
-    // Clear redux-firestore state on logout
-    /* dispatch({ type: actionTypes.CLEAR_DATA }) */
-    /* }); */
-  }, [firebase]);
 
   const [signUpForm, setSignUpForm] = useState({
     name: {
@@ -261,7 +252,6 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
           console.log('password changed');
         })
         .catch(error => {
-          // An error happened.
           setErrorMessage(error);
           console.log(error);
           return false;
@@ -275,7 +265,20 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
     }
   };
 
+  const sortInputs = (a, b) => {
+    const keyA = a.id;
+    const keyB = b.id;
+    let comparison = 0;
+    if (keyA > keyB) {
+      comparison = 1;
+    } else if (keyA < keyB) {
+      comparison = -1;
+    }
+    return comparison;
+  };
+
   let form = null;
+
   if (isSignUp) {
     const formElementsArray = [];
     for (let key in signUpForm) {
@@ -284,6 +287,8 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
         config: signUpForm[key]
       });
     }
+
+    formElementsArray.sort(sortInputs);
 
     form = (
       <StyledForm onSubmit={submitSignUp}>
@@ -338,6 +343,7 @@ const Auth = ({ onSignUp, signUpLoading, loginError, signUpError }) => {
         config: loginForm[key]
       });
     }
+    formElementsArray.sort(sortInputs);
 
     form = (
       <StyledForm onSubmit={submitLogin}>
@@ -483,12 +489,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  firestoreConnect(props => {
-    props.firebase.logout().then(() => {
-      props.dispatch({ type: actionTypes.CLEAR_DATA });
-    });
-    return [];
-  })
-)(Auth);
+export default connect(mapStateToProps, mapDispatchToProps)(Auth);

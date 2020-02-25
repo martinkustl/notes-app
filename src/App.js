@@ -1,5 +1,5 @@
 import React, { useState, Fragment, useEffect } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 
 import 'firebase/database';
 
@@ -127,6 +127,7 @@ const App = ({ auth }) => {
   let routes = (
     <IonRouterOutlet id="main">
       <Route path="/" component={Auth} />
+      <Redirect to="/" />
     </IonRouterOutlet>
   );
 
@@ -170,6 +171,7 @@ const App = ({ auth }) => {
             <Route path="/search" component={Search} exact={true} />
             <Route path="/shared" component={Shared} exact={true} />
             <Route path="/" component={Home} exact={true} />
+            <Redirect to="/" />
           </IonRouterOutlet>
           {tabButtons}
         </IonTabs>
@@ -185,7 +187,6 @@ const App = ({ auth }) => {
 };
 
 const mapStateToProps = state => {
-  console.log(state);
   return {
     auth: state.firebase.auth
   };

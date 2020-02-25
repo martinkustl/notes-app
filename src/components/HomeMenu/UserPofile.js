@@ -45,6 +45,13 @@ const StyledIonAlert = styled(IonAlert)`
   --background: var(--ion-color-primary);
 `;
 
+const StyledFooter = styled.footer`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+`;
+
 const UserPofile = ({
   userName,
   userEmail,
@@ -54,13 +61,15 @@ const UserPofile = ({
   isLoading,
   isError,
   errorMessage,
-  handleConfirmErrorClick
+  handleConfirmErrorClick,
+  handleDeleteAccount
 }) => {
   const [editProfile, setEditProfile] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   let content = null;
-
   let responseComponent = null;
+  let deleteAlert = null;
 
   if (isLoading && !isError) {
     responseComponent = <IonLoading isOpen={true} message="Provádím změny" />;
@@ -84,6 +93,30 @@ const UserPofile = ({
     );
   }
 
+  if (showDeleteAlert) {
+    deleteAlert = (
+      <StyledIonAlert
+        isOpen={true}
+        message="Opravdu chcete smazat váš účet?"
+        onDidDismiss={() => setShowDeleteAlert(false)}
+        color="primary"
+        backdropDismiss={false}
+        buttons={[
+          {
+            text: 'Ano',
+            cssClass: classes.alertButtonDanger,
+            handler: () => handleDeleteAccount()
+          },
+          {
+            text: 'Ne',
+            cssClass: classes.alertButton,
+            handler: () => setShowDeleteAlert(false)
+          }
+        ]}
+      />
+    );
+  }
+
   if (editProfile) {
     content = (
       <IonList className="ion-no-padding">
@@ -97,10 +130,10 @@ const UserPofile = ({
             <StyledIonlabel position="stacked">Jméno</StyledIonlabel>
             <IonInput readonly={false} value={userName} name="name" />
           </IonItem>
-          <IonItem lines="bottom">
+          {/*          <IonItem lines="bottom">
             <StyledIonlabel position="stacked">Email</StyledIonlabel>
             <IonInput readonly={false} value={userEmail} name="email" />
-          </IonItem>
+          </IonItem> */}
           <StyledFormButtonsWrapper>
             <IonButton
               slot="start"
@@ -176,7 +209,18 @@ const UserPofile = ({
       <IonContent color="primary">
         {content}
         {responseComponent}
+        {deleteAlert}
       </IonContent>
+      <StyledFooter>
+        <IonButton
+          expand="block"
+          fill="clear"
+          color="danger"
+          onClick={() => setShowDeleteAlert(true)}
+        >
+          Zrušit účet
+        </IonButton>
+      </StyledFooter>
     </IonModal>
   );
 };

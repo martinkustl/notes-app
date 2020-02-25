@@ -17,6 +17,8 @@ import { StyledIonList } from '../../styles';
 
 import { useFirebase, useFirestore } from 'react-redux-firebase';
 
+import { actionTypes } from 'redux-firestore';
+
 import useErrorMessage from '../../shared/useErrorMessage';
 
 import styled from 'styled-components';
@@ -41,34 +43,27 @@ const HomeMenu = ({ userEmail, userName, uid }) => {
   const handleSubmitProfileChange = e => {
     e.preventDefault();
     const newName = e.target.name.value;
-    const newEmail = e.target.email.value;
-    if (newEmail !== userEmail || newName !== userName) {
+    if (newName !== userName) {
       setIsLoading(true);
     }
-
-    if (newEmail !== userEmail && newName !== userName) {
-      const emailPromise = firebase.updateEmail(newEmail, true);
-      const namePromise = firestore.update(
-        { collection: 'users', doc: uid },
-        { userName: newName }
-      );
-      Promise.all([emailPromise, namePromise])
-        .then(res => {
-          setIsLoading(false);
-        })
-        .catch(err => setErrorMessage(err));
-    } else if (newEmail !== userEmail) {
-      firebase
-        .updateEmail(newEmail, true)
-        .then(() => setIsLoading(false))
-        .catch(err => {
-          setErrorMessage(err);
-        });
-    } else if (newName !== userName) {
+    if (newName !== userName) {
       firestore
         .update({ collection: 'users', doc: uid }, { userName: newName })
         .then(() => setIsLoading(false));
     }
+  };
+
+  const handleDeleteAccount = () => {
+    const user = firebase.auth().currentUser;
+    user
+      .delete()
+      .then(res => {
+        firebase.logout();
+      })
+      .catch(err => {
+        console.log(err);
+        setErrorMessage(err);
+      });
   };
 
   const handleConfirmErrorClick = () => {
@@ -77,7 +72,12 @@ const HomeMenu = ({ userEmail, userName, uid }) => {
   };
 
   const logoutClick = () => {
-    firebase.logout();
+    firebase
+      .logout()
+      .then(() => {
+        firebase.dispatch({ type: actionTypes.CLEAR_DATA });
+      })
+      .catch(err => console.log(err));
   };
 
   const handleOpenProfile = () => {
@@ -121,6 +121,7 @@ const HomeMenu = ({ userEmail, userName, uid }) => {
           isError={isError}
           errorMessage={errorMessage}
           handleConfirmErrorClick={handleConfirmErrorClick}
+          handleDeleteAccount={handleDeleteAccount}
         />
       </IonContent>
     </IonMenu>

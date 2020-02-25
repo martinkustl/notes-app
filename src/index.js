@@ -6,7 +6,6 @@ import { defineCustomElements } from '@ionic/pwa-elements/loader';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
-/* import 'firebase/storage'; */
 
 import {
   ReactReduxFirebaseProvider,
@@ -14,6 +13,7 @@ import {
   firebaseReducer
 } from 'react-redux-firebase';
 import { createFirestoreInstance, firestoreReducer } from 'redux-firestore';
+
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';

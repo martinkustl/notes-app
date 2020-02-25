@@ -155,7 +155,6 @@ const Note = ({
         });
     }
     return () => {
-      console.log(unsubscribe);
       if (unsubscribe) {
         unsubscribe();
       }
