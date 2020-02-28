@@ -106,6 +106,7 @@ const Note = ({
   const [showShareModal, setShowShareModal] = useState(false);
   const [cursorPosition, setCursorPosition] = useState();
   const quillRef = useRef(null);
+  const headingRef = useRef(null);
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState();
   const [uploadingImage, setUploadingImage] = useState({
@@ -164,15 +165,16 @@ const Note = ({
   useEffect(() => {
     if (quillRef.current && note) {
       const quillHTML = quillRef.current.getEditor().root.innerHTML;
-      if (quillHTML === note.content) {
-        // Database and user content are equal
-      } else {
-        setNoteHeading(note.heading);
+      if (quillHTML !== note.content) {
+        /* setNoteHeading(note.heading); */
         setNoteText(note.content);
         quillRef.current
           .getEditor()
           .clipboard.dangerouslyPasteHTML(note.content);
         quillRef.current.blur();
+      }
+      if (note.heading !== headingRef.current.value) {
+        setNoteHeading(note.heading);
       }
     }
     if (note && quillRef.current === null) {
@@ -486,6 +488,7 @@ const Note = ({
           placeholder="Nadpis"
           value={noteHeading}
           name="heading"
+          ref={headingRef}
           onIonChange={handleNoteHeadingChange}
           required={true}
           className="ion-no-padding"

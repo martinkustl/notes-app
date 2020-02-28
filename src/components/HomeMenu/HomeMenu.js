@@ -58,6 +58,7 @@ const HomeMenu = ({ userEmail, userName, uid }) => {
     user
       .delete()
       .then(res => {
+        console.log(res);
         firebase.logout();
       })
       .catch(err => {

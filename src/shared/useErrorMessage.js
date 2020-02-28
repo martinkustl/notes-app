@@ -13,7 +13,7 @@ const errorMessageReducer = (state, action) => {
         ...state,
         error: true,
         message:
-          'Pro změnu emailu je nutné nedávné přihlášení. Před dalším pokusem o změnu se odhlašte a znovu přihlašte.'
+          'Pro tuto operaci je nutné nedávné přihlášení. Před dalším pokusem o změnu se odhlašte a znovu přihlašte.'
       };
     case 'auth/user-not-found':
       return {

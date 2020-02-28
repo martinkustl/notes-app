@@ -41,9 +41,8 @@ const StyledIonListHeader = styled(IonListHeader)`
 `;
 
 const Home = ({ notes, firestore }) => {
-  let notesList = (
-    <IonLoading isOpen={!notes} message="Načítnání" backdropDismiss={true} />
-  );
+  let notesList = null;
+
   if (notes && isPlatform('ios')) {
     notesList = (
       <StyledIonList color="primary">
@@ -107,6 +106,10 @@ const Home = ({ notes, firestore }) => {
           );
         })}
       </StyledIonList>
+    );
+  } else {
+    notesList = (
+      <IonLoading isOpen={true} message="Načítnání" backdropDismiss={true} />
     );
   }
 
