@@ -130,10 +130,6 @@ const UserPofile = ({
             <StyledIonlabel position="stacked">Jméno</StyledIonlabel>
             <IonInput readonly={false} value={userName} name="name" />
           </IonItem>
-          {/*          <IonItem lines="bottom">
-            <StyledIonlabel position="stacked">Email</StyledIonlabel>
-            <IonInput readonly={false} value={userEmail} name="email" />
-          </IonItem> */}
           <StyledFormButtonsWrapper>
             <IonButton
               slot="start"

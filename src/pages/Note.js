@@ -69,7 +69,6 @@ const StyledUploadImageModal = styled(IonModal)`
   --max-width: 50vw;
   --min-width: 210px;
   --min-height: 150px;
-  /* --height: auto; */
 `;
 
 const StyledUploadProgressDiv = styled.div`
@@ -166,7 +165,6 @@ const Note = ({
     if (quillRef.current && note) {
       const quillHTML = quillRef.current.getEditor().root.innerHTML;
       if (quillHTML !== note.content) {
-        /* setNoteHeading(note.heading); */
         setNoteText(note.content);
         quillRef.current
           .getEditor()

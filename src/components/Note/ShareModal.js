@@ -149,13 +149,6 @@ const ShareModal = ({
         </IonToolbar>
       </IonHeader>
       <IonContent color="primary">
-        {/*       <IonButton
-        onClick={() => setShowShareModal(false)}
-        color="secondary"
-        fill="outline"
-      >
-        Zavřít
-      </IonButton> */}
         <StyledForm onSubmit={submitShareForm}>
           <StyledIonInput
             value={shareInput}

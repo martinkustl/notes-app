@@ -6,8 +6,6 @@ import { firestoreConnect } from 'react-redux-firebase';
 
 import { isPlatform } from '@ionic/react';
 
-/* import * as actionCreators from '../store/actions/index';
- */
 import { trash } from 'ionicons/icons';
 
 import {
@@ -26,8 +24,6 @@ import {
   IonItemOption,
   IonLoading
 } from '@ionic/react';
-
-/* import { add, more } from 'ionicons/icons'; */
 
 import { StyledIonList } from '../styles';
 
@@ -118,13 +114,7 @@ const Home = ({ notes, firestore }) => {
       <IonHeader>
         <IonToolbar color="primary">
           <IonButtons slot="start">
-            <IonMenuButton
-              color="secondary" /* autoHide={false} */
-              /* menu="infoTabMenu" */
-              /* menu="Main" */
-              menu="mainMenu"
-              /* autoHide={false} */
-            ></IonMenuButton>
+            <IonMenuButton color="secondary" menu="mainMenu"></IonMenuButton>
           </IonButtons>
           <IonTitle>Notes App</IonTitle>
         </IonToolbar>

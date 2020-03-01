@@ -31,9 +31,7 @@ const InfoTab = ({ note }) => {
   let collabList = null;
 
   const convertToDateTime = seconds => {
-    //var t = new Date(1970, 0, 1); // Epoch
     const t = new Date(seconds * 1000);
-    // t.setSeconds(seconds * 1000);
     return `${t.getDate()}.${t.getMonth() +
       1}.${t.getFullYear()} v ${t.getHours()}:${t.getMinutes()} `;
   };

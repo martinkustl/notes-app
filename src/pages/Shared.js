@@ -39,7 +39,6 @@ const Shared = ({ notes }) => {
               return (
                 <IonItem
                   routerDirection="forward"
-                  /* routerLink={`/shared/sharednote/${note.id}`} */
                   routerLink={`/shared/sharednote/${note.id}`}
                   key={index}
                   detail
