@@ -3,9 +3,9 @@
 src - obsahuje zdrojový kód aplikace <br>
 build - build verze pro webový prohlížeč <br>
 ios - build verze pro ios <br>
-android - build verze pro android - android/app/release <br>
+android - build verze pro android <br>
 
- <ul><li>obsahuje instalovatelnou verzi aplikace pro platformu Android</li></ul>
+ <ul><li> android/app/release - obsahuje instalovatelnou verzi aplikace pro platformu Android</li></ul>
 
 ### Příkazy pro spuštění projektu
 
