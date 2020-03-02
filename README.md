@@ -4,6 +4,7 @@ src - obsahuje zdrojový kód aplikace <br>
 build - build verze pro webový prohlížeč <br>
 ios - build verze pro ios <br>
 android - build verze pro android <br>
+android-verze-aplikace.apk - balíček, skrze který lze aplikaci nainstalovat na platformu Android <br>
 
  <ul><li> android/app/release - obsahuje instalovatelnou verzi aplikace pro platformu Android</li></ul>
 
